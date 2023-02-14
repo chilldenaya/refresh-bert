@@ -1,6 +1,15 @@
 # Code refactor of Refresh: Ranking Sentences for Extractive Summarization with Reinforcement Learning
 
-This repository releases our code for the Refresh model. It is improved from our code for [Sidenet](https://github.com/shashiongithub/sidenet). It uses Tensorflow 0.10, please use scripts provided by Tensorflow to translate them to newer upgrades. 
+This repository is a refactored codebase of REFRESH created by Sashi Narayan.
+Changes in this repository
+
+- Adding SentenceBERT as sentence embedding (TODO)
+- Code refactors
+- Additional docstring for better code readability
+
+---
+
+This repository releases our code for the Refresh model. It is improved from our code for [Sidenet](https://github.com/shashiongithub/sidenet). It uses Tensorflow 0.10, please use scripts provided by Tensorflow to translate them to newer upgrades.
 
 Please contact me at shashi.narayan@gmail.com for any question.
 
@@ -12,26 +21,26 @@ Please cite this paper if you use our code or data:
 
 ## CNN and Dailymail Data
 
-In addition to our code, please find links to additional files which are not uploaded here. 
+In addition to our code, please find links to additional files which are not uploaded here.
 
 #### Preprocessed Data and Word Embedding File
 
-* [Pretrained word embeddings](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-1-billion-benchmark-wordembeddings.tar.gz) trained on "1 billion word language modeling benchmark r13output" (405MB)
-* [Preprocessed CNN and DailyMail data](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-preprocessed-input-data.tar.gz): Articles are tokenized/segmented with the original case. Then, words are replaced with word ids in the word embedding file with (PAD_ID = 0, UNK_ID = 1). (1.9GB) 
-* [Original Test and Validation mainbody data](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-CNN-DM-Filtered-TokenizedSegmented.tar.gz): These files are used to assemble summaries. (35MB)
-* [Gold Test and Validation highlights](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-baseline-gold-data.tar.gz): These files are used to estimate ROUGE scores. (11MB)
+- [Pretrained word embeddings](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-1-billion-benchmark-wordembeddings.tar.gz) trained on "1 billion word language modeling benchmark r13output" (405MB)
+- [Preprocessed CNN and DailyMail data](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-preprocessed-input-data.tar.gz): Articles are tokenized/segmented with the original case. Then, words are replaced with word ids in the word embedding file with (PAD_ID = 0, UNK_ID = 1). (1.9GB)
+- [Original Test and Validation mainbody data](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-CNN-DM-Filtered-TokenizedSegmented.tar.gz): These files are used to assemble summaries. (35MB)
+- [Gold Test and Validation highlights](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-baseline-gold-data.tar.gz): These files are used to estimate ROUGE scores. (11MB)
 
 #### Best Pretrained Models
 
-We train for a certain number of epochs and then we estimate ROUGE score on the validation set after each epoch. The chosen models are the best ones performing on the validation set.  
+We train for a certain number of epochs and then we estimate ROUGE score on the validation set after each epoch. The chosen models are the best ones performing on the validation set.
 
-* [CNN and DailyMail Pretrained Models](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-pretrained-models.tar.gz) (1.8GB)
+- [CNN and DailyMail Pretrained Models](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-pretrained-models.tar.gz) (1.8GB)
 
 #### Human Evaluation Data
 
 We have selected 20 (10 CNN and 10 DailyMail) articles. Please see our paper for the experiment setup.
 
-* [CNN and DailyMail Human Evaluation Data](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-human-evaluations.tar.gz)
+- [CNN and DailyMail Human Evaluation Data](http://bollin.inf.ed.ac.uk/public/direct/Refresh-NAACL18-human-evaluations.tar.gz)
 
 ## Training and Evaluation Instructions
 
@@ -44,7 +53,7 @@ gold_summary_directory: /address/data/Baseline-Gold-Models (Gold summary directo
 doc_sentence_directory: /address/data/CNN-DM-Filtered-TokenizedSegmented (Directory where document sentences are kept)
 ```
 
-#### CNN 
+#### CNN
 
 ```
 mkdir -p /address/to/training/directory/cnn-reinforcementlearn-singlesample-from-moracle-noatt-sample5
@@ -70,11 +79,10 @@ python document_summarizer_training_testing.py --use_gpu /gpu:2 --data_mode dail
 
 ## Oracle Estimation
 
-Check our "scripts/oracle-estimator" to compute multiple oracles for your own dataset for training. 
+Check our "scripts/oracle-estimator" to compute multiple oracles for your own dataset for training.
 
 ## Blog post and Live Demo
 
 You could find a live demo of Refresh [here](http://kinloch.inf.ed.ac.uk/sidenet.html).
 
 See [here](https://nurture.ai/p/e5c2a653-404a-4af8-b35f-e9e0d17fd272) for a light introduction of our paper written by [nurture.ai](https://nurture.ai).
-
