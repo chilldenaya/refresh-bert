@@ -1,7 +1,8 @@
 # Code refactor of Refresh: Ranking Sentences for Extractive Summarization with Reinforcement Learning
 
 This repository is a refactored codebase of REFRESH created by Sashi Narayan.
-Changes in this repository
+
+Changes in this repository:
 
 - Adding SentenceBERT as sentence embedding (TODO)
 - Code refactors
