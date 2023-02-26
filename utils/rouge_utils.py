@@ -55,24 +55,6 @@ def _get_word_ngrams(n, sentences):
     return _get_ngrams(n, words)
 
 
-def _len_lcs(x, y):
-    """
-    Returns the length of the Longest Common Subsequence between sequences x
-    and y.
-    Source: http://www.algorithmist.com/index.php/Longest_Common_Subsequence
-
-    Args:
-      x: sequence of words
-      y: sequence of words
-
-    Returns
-      integer: Length of LCS between x and y
-    """
-    table = _lcs(x, y)
-    n, m = len(x), len(y)
-    return table[n, m]
-
-
 def _lcs(x, y):
     """
     Computes the length of the longest common subsequence (lcs) between two

@@ -533,7 +533,7 @@ def reward_weighted_cross_entropy_loss_multisample(
     Add summary for "cost" and "cost/avg".
     Args:
         logits: Logits from inference(). [FLAGS.batch_size, FLAGS.max_doc_length, FLAGS.target_label_size]
-        labels: Label placeholdr for multiple sampled prediction [FLAGS.batch_size, 1, FLAGS.max_doc_length, FLAGS.target_label_size]
+        labels: Label placeholder for multiple sampled prediction [FLAGS.batch_size, 1, FLAGS.max_doc_length, FLAGS.target_label_size]
         actual_rewards: [FLAGS.batch_size, 1]
         weights: Weights to avoid padded part [FLAGS.batch_size, FLAGS.max_doc_length]
     Returns:
@@ -559,6 +559,7 @@ def reward_weighted_cross_entropy_loss_multisample(
         weights_expanded = weights_temp
 
         # 2. Reshape logits and labels for softmax function
+        # flatten it to calculate the ce for the batch as a whole
         logits_expanded = tf.reshape(
             logits_expanded, [-1, FLAGS.target_label_size]
         )  # [FLAGS.batch_size*1*FLAGS.max_doc_length, FLAGS.target_label_size]
@@ -567,6 +568,11 @@ def reward_weighted_cross_entropy_loss_multisample(
         )  # [FLAGS.batch_size*1*FLAGS.max_doc_length, FLAGS.target_label_size]
 
         # 3. Calculate cross entropy by softmax
+        # cross_entropy = softmax_cross_entropy_with_logits
+        # is the same as
+        # softmax = tf.nn.softmax(logits)
+        # cross_entropy = -tf.reduce_sum(labels * tf.log(softmax), 1)
+        # https://stackoverflow.com/questions/42521400/calculating-cross-entropy-in-tensorflow
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
             logits_expanded, labels
         )  # [FLAGS.batch_size*1*FLAGS.max_doc_length]

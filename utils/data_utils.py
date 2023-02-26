@@ -31,7 +31,7 @@ class Data:
         self.docs = []
         self.titles = []
         self.images = []
-        self.labels = []
+        self.labels = []  # [ d1[[1, 19, 25], [1 19]], d2[[20 27 43], [20 27 35]] ]
         self.rewards = []
         self.weights = []
 
@@ -243,17 +243,22 @@ class Data:
             labels_set = (
                 []
             )  # FLAGS.num_sample_rollout, FLAGS.max_doc_length, FLAGS.target_label_size
+            # labels_set = [ d1[[1,0], [0,1], ..., [0,1]], d2[[1,0], [0,1], ..., [0,1]] ]
             reward_set = (
                 []
             )  # FLAGS.num_sample_rollout, FLAGS.max_doc_length, FLAGS.target_label_size
-            for idx in range(FLAGS.num_sample_rollout):
+
+            for candidate_summary_idx in range(FLAGS.num_sample_rollout):
                 thislabels = []
-                if idx < len(self.labels[fileindex]):
+                # self.labels[fileindex] = d1[[1, 19, 25], [1 19]]
+                if candidate_summary_idx < len(self.labels[fileindex]):
                     thislabels = [
-                        [1, 0] if (item in self.labels[fileindex][idx]) else [0, 1]
+                        [1, 0]
+                        if (item in self.labels[fileindex][candidate_summary_idx])
+                        else [0, 1]
                         for item in range(FLAGS.max_doc_length)
                     ]
-                    reward_set.append(self.rewards[fileindex][idx])
+                    reward_set.append(self.rewards[fileindex][candidate_summary_idx])
                 else:
                     # Simply copy the best one
                     thislabels = [
@@ -435,8 +440,8 @@ class Data:
                 for line in label_lines[2 : FLAGS.num_sample_rollout + 2]:
                     thislabel.append([int(item) for item in line.split()[:-1]])
                     thisreward.append(float(line.split()[-1]))
-                self.labels.append(thislabel)
-                self.rewards.append(thisreward)
+                self.labels.append(thislabel)  # [[1, 19, 25], [1 19]]
+                self.rewards.append(thisreward)  # [0.555, 0.0508]
             else:
                 print("Some problem with %s.* files. Exiting!" % full_data_file_prefix)
                 exit(0)

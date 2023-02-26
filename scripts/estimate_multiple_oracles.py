@@ -10,15 +10,15 @@ import re
 import sys
 from multiprocessing import Pool
 
-from scripts import rouge
+from utils import rouge_utils
 
 
 def cal_rouge(fullset, sentdata, golddata):
     fullset.sort()
     model_highlights = [sentdata[idx] for idx in range(len(sentdata)) if idx in fullset]
-    rouge_1 = rouge.rouge_n(model_highlights, golddata, 1)["f"]
-    rouge_2 = rouge.rouge_n(model_highlights, golddata, 2)["f"]
-    rouge_l = rouge.rouge_l_summary_level(model_highlights, golddata)["f"]
+    rouge_1 = rouge_utils.rouge_n(model_highlights, golddata, 1)["f"]
+    rouge_2 = rouge_utils.rouge_n(model_highlights, golddata, 2)["f"]
+    rouge_l = rouge_utils.rouge_l_summary_level(model_highlights, golddata)["f"]
     rouge_score = (rouge_1 + rouge_2 + rouge_l) / 3.0
     return (rouge_score, fullset)
 
