@@ -27,39 +27,6 @@ def _multi_run_wrapper(args):
     return cal_rouge(*args)
 
 
-def get_fileids(topdir, newstype, datatype, server):
-    if newstype == "cnn":
-        return (
-            open(
-                topdir
-                + "/Temp-ServerFileIds/cnn-"
-                + datatype
-                + "-fileids.txt."
-                + server
-            )
-            .read()
-            .strip()
-            .split("\n")
-        )
-
-    if newstype == "dailymail":
-        return (
-            open(
-                topdir
-                + "/Temp-ServerFileIds/dailymail-"
-                + datatype
-                + "-fileids.txt."
-                + server
-            )
-            .read()
-            .strip()
-            .split("\n")
-        )
-
-    print("Error: Only CNN and DailyMail allowed.")
-    exit(0)
-
-
 if __name__ == "__main__":
     args = sys.argv[1:]
 
