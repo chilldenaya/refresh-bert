@@ -13,7 +13,8 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.ops import seq2seq, variable_scope
+import tensorflow.contrib.seq2seq as seq2seq
+from tensorflow.python.ops import variable_scope
 
 # from tf.nn import variable_scope
 from flags import FLAGS
@@ -241,10 +242,6 @@ def simple_attentional_rnn(rnn_input, attention_state_list, initial_state=None):
 
     # Setup attentional RNNs
     dtype = tf.float16 if FLAGS.use_fp16 else tf.float32
-
-    # if initial_state == None:
-    #   batch_size = tf.shape(rnn_input[0])[0]
-    #   initial_state = cell.zero_state(batch_size, dtype)
 
     rnn_outputs, rnn_state = seq2seq.attention_decoder(
         rnn_input,

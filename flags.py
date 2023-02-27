@@ -119,7 +119,7 @@ tf.app.flags.DEFINE_integer(
 ### Training features
 
 tf.app.flags.DEFINE_string(
-    "train_dir", "/address/to/training/directory", "Training directory."
+    "train_dir", "./training", "Training directory."
 )
 
 tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
@@ -140,7 +140,7 @@ tf.app.flags.DEFINE_integer(
 
 tf.app.flags.DEFINE_string(
     "pretrained_wordembedding",
-    "/address/data/1-billion-word-language-modeling-benchmark-r13output.word2vec.vec",
+    "./data/1-billion-word-language-modeling-benchmark-r13output.word2vec.vec",
     "Pretrained wordembedding file trained on the one million benchmark data.",
 )
 
@@ -148,19 +148,19 @@ tf.app.flags.DEFINE_string(
 
 tf.app.flags.DEFINE_string(
     "preprocessed_data_directory",
-    "/address/data/preprocessed-input-directory",
+    "./data/preprocessed-input-directory",
     "Pretrained news articles for various types of word embeddings.",
 )
 
 tf.app.flags.DEFINE_string(
     "gold_summary_directory",
-    "/address/data/Baseline-Gold-Models",
+    "./data/Baseline-Gold-Models",
     "Gold summary directory.",
 )
 
 tf.app.flags.DEFINE_string(
     "doc_sentence_directory",
-    "/address/data/CNN-DM-Filtered-TokenizedSegmented",
+    "./data/CNN-DM-Filtered-TokenizedSegmented",
     "Directory where document sentences are kept.",
 )
 

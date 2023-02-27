@@ -8,6 +8,15 @@ Changes in this repository:
 - Code refactors
 - Additional docstring for better code readability
 
+To install and initiate environment:
+https://stackoverflow.com/questions/67380286/anaconda-channel-for-installing-python-2-7
+```
+CONDA_SUBDIR=osx-64 conda create -n py27 python=2.7
+
+# ensure that future package installs in this env stick to 'osx-64'
+conda activate py27
+conda config --env --set subdir osx-64
+```
 ---
 
 This repository releases our code for the Refresh model. It is improved from our code for [Sidenet](https://github.com/shashiongithub/sidenet). It uses Tensorflow 0.10, please use scripts provided by Tensorflow to translate them to newer upgrades.
@@ -49,8 +58,11 @@ Please download data using the above links and then either update `my_flags.py` 
 
 ```
 pretrained_wordembedding: /address/data/1-billion-word-language-modeling-benchmark-r13output.word2vec.vec (Pretrained wordembedding file trained on the one million benchmark data)
+
 preprocessed_data_directory: /address/data/preprocessed-input-directory (Preprocessed news articles)
+
 gold_summary_directory: /address/data/Baseline-Gold-Models (Gold summary directory)
+
 doc_sentence_directory: /address/data/CNN-DM-Filtered-TokenizedSegmented (Directory where document sentences are kept)
 ```
 
