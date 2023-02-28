@@ -20,7 +20,6 @@ from pyrouge import Rouge155
 
 from flags import FLAGS
 
-
 def _rouge(system_dir, gold_dir):
     r = Rouge155()
     r.system_dir = system_dir
@@ -29,7 +28,7 @@ def _rouge(system_dir, gold_dir):
     r.model_filename_pattern = "#ID#.gold"
 
     output = r.convert_and_evaluate(
-        rouge_args="-e /address/to/rouge/data/directory/rouge/data -a -c 95 -m -n 4 -w 1.2"
+        rouge_args="-e /Users/denaya/z/balebali/rouge/tools/ROUGE-1.5.5/data -a -c 95 -m -n 4 -w 1.2"
     )
     output_dict = r.output_to_dict(output)
 

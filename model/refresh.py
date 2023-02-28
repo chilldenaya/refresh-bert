@@ -110,7 +110,7 @@ class Refresh:
         )
 
         # 11. Define train saver
-        self.saver = tf.train.Saver(tf.all_variables(), max_to_keep=None)
+        self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=None)
 
         # 12. Define scalar summary operations
         self.rewardweighted_ce_multisample_loss_summary = tf.scalar_summary(
@@ -123,7 +123,7 @@ class Refresh:
         )
 
         # 13. Initializations
-        init = tf.initialize_all_variables()
+        init = tf.global_variables_initializer()
         sess.run(init)
 
         # 14. Create summary graph for Tensorboard

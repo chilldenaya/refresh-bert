@@ -448,7 +448,10 @@ class Data:
 
             if doccount % 10000 == 0:
                 print("%d ..." % doccount)
+            
             doccount += 1
+            if doccount == 39:
+                break
 
         # Set Fileindices
         self.fileindices = range(len(self.filenames))
