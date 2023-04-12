@@ -151,7 +151,7 @@ def conv1d_layer_sentence_representation(sent_wordembeddings):
             )
             exit(0)
 
-    for filterwidth in xrange(1, FLAGS.max_filter_length + 1):
+    for filterwidth in range(1, FLAGS.max_filter_length + 1):
         with tf.variable_scope("Conv1D_%d" % filterwidth) as scope:
 
             # Convolution
@@ -395,7 +395,7 @@ def predict_topranked(batch_softmax_logits, batch_weights, batch_filenames):
                     oneprob_sentidx[prob].append(sentidx)
             else:
                 break
-        oneprob_keys = oneprob_sentidx.keys()
+        oneprob_keys = list(oneprob_sentidx.keys())
         oneprob_keys.sort(reverse=True)
 
         # Rank sentences with scores: if same score lower ones ranked first

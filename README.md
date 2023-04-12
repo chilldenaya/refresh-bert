@@ -17,6 +17,15 @@ CONDA_SUBDIR=osx-64 conda create -n py27 python=2.7
 conda activate py27
 conda config --env --set subdir osx-64
 ```
+
+To support SBERT: use python3.6 and tensorflow 0.12.1
+https://jamescalam.medium.com/hugging-face-and-sentence-transformers-on-m1-macs-4b12e40c21ce
+```
+CONDA_SUBDIR=osx-64 conda create -y  -n py36sbert python=3.6
+conda activate py36sbert
+pip install tensorflow==0.12.1
+pip install pyrouge==0.1.3
+```
 ---
 
 This repository releases our code for the Refresh model. It is improved from our code for [Sidenet](https://github.com/shashiongithub/sidenet). It uses Tensorflow 0.10, please use scripts provided by Tensorflow to translate them to newer upgrades.

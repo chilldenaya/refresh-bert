@@ -290,6 +290,7 @@ class Data:
         )
 
     def shuffle_fileindices(self):
+        self.fileindices = list(self.fileindices)
         random.shuffle(self.fileindices)
 
     def write_to_files(self, data_type):
