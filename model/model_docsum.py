@@ -257,6 +257,8 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
                 FLAGS.sentembed_size,
             )
         document_sents_enc = document_sent_embedding[: FLAGS.max_doc_length]
+        print("document_sents_enc shape: %s" % str(document_sents_enc.shape))
+
         if FLAGS.doc_encoder_reverse:
             document_sents_enc = document_sents_enc[::-1]
         document_sents_ext = document_sent_embedding[: FLAGS.max_doc_length]
