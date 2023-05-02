@@ -199,6 +199,18 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
 
         # 3. Create convolution layer (sentence encoder)
         with tf.variable_scope("ConvLayer") as scope:
+            # [document length, sentence length, word embedding length]
+            # example:
+            # [
+            #   doc1[
+            #       word1[],
+            #       word2[]
+            #   ],
+            #   doc2[
+            #       word1[],
+            #       word2[]
+            #   ],
+            # ]
             document_word_embedding = tf.reshape(
                 document_word_embedding,
                 [-1, FLAGS.max_sent_length, FLAGS.wordembed_size],
@@ -206,6 +218,14 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
             document_sent_embedding = conv1d_layer_sentence_representation(
                 document_word_embedding
             )  # [None, sentembed_size]
+
+            print(
+                "document_word_embedding shape: %s" % str(document_word_embedding.shape)
+            )
+            print(
+                "document_sent_embedding shape: %s" % str(document_sent_embedding.shape)
+            )
+
             document_sent_embedding = tf.reshape(
                 document_sent_embedding,
                 [
@@ -217,6 +237,10 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
                     ),
                     FLAGS.sentembed_size,
                 ],
+            )
+            print(
+                "document_sent_embedding after reshape: %s"
+                % str(document_sent_embedding.shape)
             )
 
         # 4. Reshape sentence embedding
