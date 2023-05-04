@@ -211,6 +211,13 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
             #       word2[]
             #   ],
             # ]
+            print(
+                "FLAGS.max_sent_length shape: %s" % str(FLAGS.max_sent_length)
+            )
+            print(
+                "FLAGS.wordembed_size shape: %s" % str(FLAGS.wordembed_size)
+            )        
+
             document_word_embedding = tf.reshape(
                 document_word_embedding,
                 [-1, FLAGS.max_sent_length, FLAGS.wordembed_size],
@@ -220,10 +227,10 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
             )  # [None, sentembed_size]
 
             print(
-                "document_word_embedding shape: %s" % str(document_word_embedding.shape)
+                "document_word_embedding shape: %s" % str(document_word_embedding.get_shape())
             )
             print(
-                "document_sent_embedding shape: %s" % str(document_sent_embedding.shape)
+                "document_sent_embedding shape: %s" % str(document_sent_embedding.get_shape())
             )
 
             document_sent_embedding = tf.reshape(
@@ -240,7 +247,7 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
             )
             print(
                 "document_sent_embedding after reshape: %s"
-                % str(document_sent_embedding.shape)
+                % str(document_sent_embedding.get_shape())
             )
 
         # 4. Reshape sentence embedding
@@ -257,12 +264,19 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
                 FLAGS.sentembed_size,
             )
         document_sents_enc = document_sent_embedding[: FLAGS.max_doc_length]
-        print("document_sents_enc shape: %s" % str(document_sents_enc.shape))
+        print("document_sents_enc shape: %s" % str(document_sents_enc[0].get_shape()))
 
         if FLAGS.doc_encoder_reverse:
             document_sents_enc = document_sents_enc[::-1]
         document_sents_ext = document_sent_embedding[: FLAGS.max_doc_length]
         document_sents_titimg = document_sent_embedding[FLAGS.max_doc_length :]
+
+        # FLAGS.max_sent_length shape: 20
+        # FLAGS.wordembed_size shape: 200
+        # document_word_embedding shape: (?, 20, 200)
+        # document_sent_embedding shape: (?, 350)
+        # document_sent_embedding after reshape: (?, 110, 350)
+        # document_sents_enc shape: (?, 350)
 
         # 5. Create document encoder
         with tf.variable_scope("DocEnc") as scope:
