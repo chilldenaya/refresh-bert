@@ -17,7 +17,7 @@ import os
 
 import tensorflow as tf
 
-from utils.data_utils import DataProcessor
+from utils.data_utils import DataProcessor, Data
 from flags import FLAGS
 from model.refresh import Refresh
 from utils.reward_utils import Reward_Generator
@@ -276,7 +276,7 @@ def test():
             )
 
 
-def _batch_predict_with_a_model(data, model, session=None):
+def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
 
     data_logits = []
     data_labels = []
@@ -322,13 +322,12 @@ def _batch_predict_with_a_model(data, model, session=None):
         data_logits.append(batch_logits)
         data_labels.append(batch_label)
         data_weights.append(batch_weight)
-        # print(data_logits)
 
     # Convert list to tensors
     data_logits = tf.concat(0, data_logits)
     data_lables = tf.concat(0, data_labels)
     data_weights = tf.concat(0, data_weights)
-    # print(data_logits,data_lables,data_weights)
+
     return data_logits, data_lables, data_weights
 
 

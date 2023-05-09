@@ -144,6 +144,7 @@ def conv1d_layer_sentence_representation(sent_wordembeddings):
     if FLAGS.handle_filter_output == "sum":
         output_channel = FLAGS.sentembed_size
     else:
+        # default = concat
         output_channel = FLAGS.sentembed_size / FLAGS.max_filter_length
         if output_channel * FLAGS.max_filter_length != FLAGS.sentembed_size:
             print(
