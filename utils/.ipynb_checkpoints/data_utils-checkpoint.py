@@ -133,7 +133,6 @@ class Data:
             selected_sents = [
                 docsents[sentid] for sentid in final_sentids if sentid < len(docsents)
             ]
-            # print(selected_sents)
 
             summary_file.write("".join(selected_sents) + "\n")
             summary_file.close()
@@ -451,7 +450,7 @@ class Data:
                 print("%d ..." % doccount)
 
             doccount += 1
-            if doccount == 50:
+            if doccount == 20:
                 break
 
         # Set Fileindices

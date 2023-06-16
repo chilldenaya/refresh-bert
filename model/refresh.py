@@ -57,6 +57,16 @@ class Refresh:
             name="label-ph",
         )
 
+        self.sbert_placeholder = tf.placeholder(
+            "float32",
+            [
+                None,
+                FLAGS.max_doc_length,
+                FLAGS.sentembed_size,
+            ],
+            name="mocksbert-ph",
+        )
+            
         # 3. Weight placeholder
         self.weight_placeholder = tf.placeholder(
             dtype, [None, FLAGS.max_doc_length], name="weight-ph"
@@ -83,7 +93,10 @@ class Refresh:
 
         # 7. Define Policy Core Network: Consists of Encoder, Decoder and Convolution
         self.extractor_output, self.logits = model_docsum.policy_network(
-            self.vocab_embed_variable, self.document_placeholder, self.label_placeholder
+            self.vocab_embed_variable, 
+            self.document_placeholder, 
+            self.label_placeholder,
+            self.sbert_placeholder,
         )
 
         # 8. Define Reward-Weighted Cross Entropy Loss

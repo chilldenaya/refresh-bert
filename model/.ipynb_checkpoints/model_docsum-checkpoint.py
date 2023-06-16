@@ -142,7 +142,12 @@ def sentence_extractor_seqrnn_docatt(
     return extractor_outputs, logits
 
 
-def policy_network(vocab_embed_variable, document_placeholder, label_placeholder):
+def policy_network(
+    vocab_embed_variable, 
+    document_placeholder, 
+    label_placeholder,
+    sbert_placeholder,
+):
     """Build the policy core network.
     Args:
     vocab_embed_variable: [vocab_size, FLAGS.wordembed_size], embeddings without PAD and UNK
@@ -196,16 +201,49 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
                     FLAGS.wordembed_size,
                 ],
             )
-
+            print(
+                "document_word_embedding shape 1: %s" % str(document_word_embedding.get_shape())
+            )
+            
         # 3. Create convolution layer (sentence encoder)
         with tf.variable_scope("ConvLayer") as scope:
+            # [document length, sentence length, word embedding length]
+            # example:
+            # [
+            #   doc1[
+            #       word1[],
+            #       word2[]
+            #   ],
+            #   doc2[
+            #       word1[],
+            #       word2[]
+            #   ],
+            # ]
+            print(
+                "FLAGS.max_sent_length shape: %s" % str(FLAGS.max_sent_length)
+            )
+            print(
+                "FLAGS.wordembed_size shape: %s" % str(FLAGS.wordembed_size)
+            )        
+
             document_word_embedding = tf.reshape(
                 document_word_embedding,
                 [-1, FLAGS.max_sent_length, FLAGS.wordembed_size],
             )
+
             document_sent_embedding = conv1d_layer_sentence_representation(
                 document_word_embedding
             )  # [None, sentembed_size]
+
+            print(
+                "document_word_embedding shape 2: %s" % str(document_word_embedding.get_shape())
+            )
+            print(
+                "document_sent_embedding shape: %s" % str(document_sent_embedding.get_shape())
+            )
+
+            
+            # document_sent_embedding = (batch_size, doc_length, sent_embedding_length)
             document_sent_embedding = tf.reshape(
                 document_sent_embedding,
                 [
@@ -218,7 +256,18 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
                     FLAGS.sentembed_size,
                 ],
             )
-
+            print(
+                "document_sent_embedding after reshape: %s"
+                % str(document_sent_embedding.get_shape())
+            )
+            
+            # INI YANG BISA DIGANTI DENGAN SBERT!!!!       
+#             document_sent_embedding = sbert_placeholder
+#             print(
+#                 "document_sent_embedding mock: %s"
+#                 % str(document_sent_embedding.get_shape())
+#             )
+            
         # 4. Reshape sentence embedding
         # [-1, (max_doc_length+max_title_length+max_image_length), sentembed_size]
         # -> List of [-1, sentembed_size]
@@ -232,11 +281,26 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
                 ),
                 FLAGS.sentembed_size,
             )
+            print(
+                "document_sent_embedding after reshape_tensor2list: %s"
+                % str(len(document_sent_embedding))
+            )
         document_sents_enc = document_sent_embedding[: FLAGS.max_doc_length]
+        print("document_sents_enc[0] shape: %s" % str(document_sents_enc[0].get_shape()))
+
         if FLAGS.doc_encoder_reverse:
             document_sents_enc = document_sents_enc[::-1]
         document_sents_ext = document_sent_embedding[: FLAGS.max_doc_length]
         document_sents_titimg = document_sent_embedding[FLAGS.max_doc_length :]
+        
+        # document_word_embedding shape 1: (?, 110, 20, 100) -> (batch_size, doc_length, sent_length, wordembed_size)
+        # FLAGS.max_sent_length shape: 20
+        # FLAGS.wordembed_size shape: 100
+        # document_word_embedding shape 2: (?, 20, 100) -> (batch_size * doc_length, sent_length, wordembed_size)
+        # document_sent_embedding shape: (?, 250)
+        # document_sent_embedding after reshape: (?, 110, 250) -> (batch_size, doc_length, sent_embedding_length)
+        # document_sent_embedding after reshape_tensor2list: 110 -> doc_length
+        # document_sents_enc[0] shape: (?, 250)
 
         # 5. Create document encoder
         with tf.variable_scope("DocEnc") as scope:
@@ -262,6 +326,7 @@ def policy_network(vocab_embed_variable, document_placeholder, label_placeholder
                     document_sents_ext, encoder_state, document_sents_titimg
                 )
             else:
+                print("attend nothing")
                 # Attend nothing
                 extractor_output, logits = sentence_extractor_nonseqrnn_noatt(
                     document_sents_ext, encoder_state
