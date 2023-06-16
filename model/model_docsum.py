@@ -210,11 +210,11 @@ def policy_network(
             # [document length, sentence length, word embedding length]
             # example:
             # [
-            #   doc1[
+            #   sent1[
             #       word1[],
             #       word2[]
             #   ],
-            #   doc2[
+            #   sent2[
             #       word1[],
             #       word2[]
             #   ],
@@ -234,6 +234,7 @@ def policy_network(
             document_sent_embedding = conv1d_layer_sentence_representation(
                 document_word_embedding
             )  # [None, sentembed_size]
+
 
             print(
                 "document_word_embedding shape 2: %s" % str(document_word_embedding.get_shape())

@@ -64,7 +64,7 @@ class Refresh:
                 FLAGS.max_doc_length,
                 FLAGS.sentembed_size,
             ],
-            name="mocksbert-ph",
+            name="sbertvec-ph",
         )
             
         # 3. Weight placeholder
@@ -72,9 +72,10 @@ class Refresh:
             dtype, [None, FLAGS.max_doc_length], name="weight-ph"
         )
 
-        # 4. Reward placeholder
-        self.actual_reward_multisample_placeholder = tf.placeholder(
-            dtype, [None, 1], name="actual-reward-multisample-ph"
+        # 7. Define Policy Core Network: Consists of Encoder, Decoder and Convolution
+        # ini yang perlu diubah dengan menggunakan SBERT
+        self.extractor_output, self.logits = model_docsum.policy_network(
+            self.vocab_embed_variable, self.document_placeholder, self.label_placeholder
         )
 
         # 5. Predicted label placeholder
@@ -84,11 +85,9 @@ class Refresh:
             name="pred-multisample-label-ph",
         )
 
-        # 6. Logit placeholder for validation and test
-        self.logits_placeholder = tf.placeholder(
-            dtype,
-            [None, FLAGS.max_doc_length, FLAGS.target_label_size],
-            name="logits-ph",
+        # 4. Reward placeholder
+        self.actual_reward_multisample_placeholder = tf.placeholder(
+            dtype, [None, 1], name="actual-reward-multisample-ph"
         )
 
         # 7. Define Policy Core Network: Consists of Encoder, Decoder and Convolution
@@ -100,9 +99,10 @@ class Refresh:
         )
 
         # 8. Define Reward-Weighted Cross Entropy Loss
+        # bagian ini harusnya gak perlu diubah lagi
         self.rewardweighted_cross_entropy_loss_multisample = (
             model_docsum.reward_weighted_cross_entropy_loss_multisample(
-                self.logits,
+                self.logits, # ini akan teradjust dengan menggunakan SBERT
                 self.predicted_multisample_label_placeholder,
                 self.actual_reward_multisample_placeholder,
                 self.weight_placeholder,
@@ -118,6 +118,14 @@ class Refresh:
         self.accuracy = model_docsum.accuracy(
             self.logits, self.label_placeholder, self.weight_placeholder
         )
+
+        # 6. Logit placeholder for validation and test
+        self.logits_placeholder = tf.placeholder(
+            dtype,
+            [None, FLAGS.max_doc_length, FLAGS.target_label_size],
+            name="logits-ph",
+        )
+
         self.final_accuracy = model_docsum.accuracy(
             self.logits_placeholder, self.label_placeholder, self.weight_placeholder
         )

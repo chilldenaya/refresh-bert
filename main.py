@@ -123,10 +123,10 @@ def train():
                     if (step % FLAGS.training_checkpoint) == 0:
                         ce_loss_val, ce_loss_sum, acc_val, acc_sum = sess.run(
                             [
-                                model.rewardweighted_cross_entropy_loss_multisample,
-                                model.rewardweighted_ce_multisample_loss_summary,
-                                model.accuracy,
-                                model.taccuracy_summary,
+                                model.rewardweighted_cross_entropy_loss_multisample, # train_op to be optimized
+                                model.rewardweighted_ce_multisample_loss_summary, # train_op summary
+                                model.accuracy, # return accuracy / model performance in this batch
+                                model.taccuracy_summary, # return accuracy / model performance summary in this batch
                             ],
                             feed_dict={
                                 model.document_placeholder: batch_docs,
