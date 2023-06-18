@@ -167,11 +167,7 @@ class Data:
         batch_docs = np.empty(
             (
                 (endidx - startidx),
-                (
-                    FLAGS.max_doc_length
-                    + FLAGS.max_title_length
-                    + FLAGS.max_image_length
-                ),
+                FLAGS.max_doc_length,
                 FLAGS.max_sent_length,
             ),
             dtype="int32",
@@ -188,6 +184,13 @@ class Data:
             dtype=dtype,
         )
         batch_reward_multiple = np.empty(((endidx - startidx), 1), dtype=dtype)
+
+        sbert_shape = (
+            FLAGS.batch_size,
+            FLAGS.max_doc_length,
+            FLAGS.sentembed_size,
+        )
+        batch_sbert_vec = np.ones(sbert_shape, dtype=np.float32)
 
         # 2. For every file in the batch:
         batch_idx = 0
@@ -286,6 +289,7 @@ class Data:
             batch_weight,
             batch_oracle_multiple,
             batch_reward_multiple,
+            batch_sbert_vec,
         )
 
     def shuffle_fileindices(self):

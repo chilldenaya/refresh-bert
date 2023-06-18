@@ -91,16 +91,10 @@ def train():
                         batch_weight,
                         batch_oracle_multiple,
                         batch_reward_multiple,
+                        batch_sbert_vec,
                     ) = train_data.get_batch(
                         ((step - 1) * FLAGS.batch_size), (step * FLAGS.batch_size)
                     )
-
-                    sbert_shape = (
-                        FLAGS.batch_size,
-                        FLAGS.max_doc_length,
-                        FLAGS.sentembed_size,
-                    )
-                    sbert_vec = np.ones(sbert_shape, dtype=np.float32)
 
                     # Print the progress
                     if (step % FLAGS.training_checkpoint) == 0:
@@ -110,12 +104,8 @@ def train():
                             model.actual_reward_multisample_placeholder: batch_reward_multiple,
                             model.label_placeholder: batch_label,
                             model.weight_placeholder: batch_weight,
-                            model.sbert_placeholder: sbert_vec,
+                            model.sbert_placeholder: batch_sbert_vec,
                         }
-                        
-                        print("EVAL LOGITS >>>>>>>>>>>>>>>>")
-                        print(model.logits.get_shape())
-                        print(sess.run(model.logits, feed_dict=feed_dict))
                         
                         ce_loss_val, ce_loss_sum, acc_val, acc_sum = sess.run(
                             [
@@ -312,20 +302,14 @@ def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
             batch_weight,
             batch_oracle_multiple,
             batch_reward_multiple,
+            batch_sbert_vec,
         ) = data.get_batch(((step - 1) * FLAGS.batch_size), (step * FLAGS.batch_size))
         
-        sbert_shape = (
-            FLAGS.batch_size,
-            FLAGS.max_doc_length,
-            FLAGS.sentembed_size,
-        )
-        sbert_vec = np.ones(sbert_shape, dtype=np.float32)
-                
         batch_logits = session.run(
             model.logits, 
             feed_dict={
                 model.document_placeholder: batch_docs,
-                model.sbert_placeholder: sbert_vec,
+                model.sbert_placeholder: batch_sbert_vec,
             }
         )
 
@@ -346,9 +330,13 @@ def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
             batch_weight,
             batch_oracle_multiple,
             batch_reward_multiple,
+            batch_sbert_vec,
         ) = data.get_batch(((step - 1) * FLAGS.batch_size), len(data.fileindices))
         batch_logits = session.run(
-            model.logits, feed_dict={model.document_placeholder: batch_docs}
+            model.logits, feed_dict={
+                model.document_placeholder: batch_docs,
+                model.sbert_placeholder: batch_sbert_vec,
+            }
         )
 
         data_logits.append(batch_logits)
