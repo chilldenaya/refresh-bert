@@ -145,7 +145,6 @@ def sentence_extractor_seqrnn_docatt(
 def policy_network(
     vocab_embed_variable, 
     document_placeholder, 
-    label_placeholder,
     sbert_placeholder,
 ):
     """Build the policy core network.
