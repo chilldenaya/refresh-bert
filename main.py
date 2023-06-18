@@ -16,7 +16,6 @@ from __future__ import absolute_import, division, print_function
 import os
 
 import tensorflow as tf
-import numpy as np
 
 from utils.data_utils import DataProcessor, Data
 from flags import FLAGS
@@ -65,9 +64,7 @@ def train():
             rouge_generator = Reward_Generator()
 
             # 4. Create MODEL object
-            print("start create model")
             model = Refresh(sess, len(vocab_dict) - 2)
-            print("finish create model")
 
             # 5. Assign word embedding to model using vocab dict created in step 1
             sess.run(model.vocab_embed_variable.assign(word_embedding_array))

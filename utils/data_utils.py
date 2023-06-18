@@ -165,11 +165,7 @@ class Data:
         # 1. Initialize batch docnames, docs, label, weight, oracle, and reward variables
         batch_docnames = np.empty((endidx - startidx), dtype="S60")
         batch_docs = np.empty(
-            (
-                (endidx - startidx),
-                FLAGS.max_doc_length,
-                FLAGS.max_sent_length,
-            ),
+            (endidx - startidx),
             dtype="int32",
         )
         batch_label = np.empty(
@@ -186,7 +182,7 @@ class Data:
         batch_reward_multiple = np.empty(((endidx - startidx), 1), dtype=dtype)
 
         sbert_shape = (
-            FLAGS.batch_size,
+            (endidx - startidx),
             FLAGS.max_doc_length,
             FLAGS.sentembed_size,
         )
@@ -201,27 +197,11 @@ class Data:
             # 4. Set batch docs
             doc_wordids = (
                 []
-            )  # [FLAGS.max_doc_length + FLAGS.max_title_length + FLAGS.max_image_length, FLAGS.max_sent_length]
+            )
             for idx in range(FLAGS.max_doc_length):
                 thissent = []
                 if idx < len(self.docs[fileindex]):
                     thissent = self.docs[fileindex][idx][:]
-                thissent = process_to_chop_pad(
-                    thissent, FLAGS.max_sent_length
-                )  # [FLAGS.max_sent_length]
-                doc_wordids.append(thissent)
-            for idx in range(FLAGS.max_title_length):
-                thissent = []
-                if idx < len(self.titles[fileindex]):
-                    thissent = self.titles[fileindex][idx][:]
-                thissent = process_to_chop_pad(
-                    thissent, FLAGS.max_sent_length
-                )  # [FLAGS.max_sent_length]
-                doc_wordids.append(thissent)
-            for idx in range(FLAGS.max_image_length):
-                thissent = []
-                if idx < len(self.images[fileindex]):
-                    thissent = self.images[fileindex][idx][:]
                 thissent = process_to_chop_pad(
                     thissent, FLAGS.max_sent_length
                 )  # [FLAGS.max_sent_length]
