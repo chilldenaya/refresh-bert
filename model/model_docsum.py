@@ -196,10 +196,7 @@ def policy_network(
                     FLAGS.wordembed_size,
                 ],
             )
-            print(
-                "document_word_embedding shape 1: %s" % str(document_word_embedding.get_shape())
-            )
-            
+
         # 3. Create convolution layer (sentence encoder)
         with tf.variable_scope("ConvLayer") as scope:
             document_word_embedding = tf.reshape(
@@ -223,7 +220,8 @@ def policy_network(
         # 4. Reshape sentence embedding
         with variable_scope.variable_scope("ReshapeDoc_TensorToList"):
             document_sent_embedding = reshape_tensor2list(
-                document_sent_embedding, # to be updated with sbert_placeholder
+#                 document_sent_embedding, 
+                sbert_placeholder, # to be updated with sbert_placeholder
                 FLAGS.max_doc_length,
                 FLAGS.sentembed_size,
             )
@@ -738,9 +736,14 @@ def train_neg_expectedreward(reward_weighted_cross_entropy_loss_multisample):
         )
 
         # 3. Clip gradient: Pascanu et al. 2013, Exploding gradient problem
-        grads_and_vars_capped_norm = [
-            (tf.clip_by_norm(grad, 5.0), var) for grad, var in grads_and_vars
-        ]
+        grads_and_vars_capped_norm = []
+        print("grads_and_vars")
+        for grad, var in grads_and_vars:
+            print(grad)
+            print(var)
+            if grad is None:
+                continue
+            grads_and_vars_capped_norm.append((tf.clip_by_norm(grad, 5.0), var))
 
         # 4. Update policy network variables by applying gradient
         return optimizer.apply_gradients(grads_and_vars_capped_norm)

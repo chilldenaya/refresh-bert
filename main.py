@@ -65,7 +65,9 @@ def train():
             rouge_generator = Reward_Generator()
 
             # 4. Create MODEL object
+            print("start create model")
             model = Refresh(sess, len(vocab_dict) - 2)
+            print("finish create model")
 
             # 5. Assign word embedding to model using vocab dict created in step 1
             sess.run(model.vocab_embed_variable.assign(word_embedding_array))
@@ -164,6 +166,7 @@ def train():
                             model.predicted_multisample_label_placeholder: batch_oracle_multiple,
                             model.actual_reward_multisample_placeholder: batch_reward_multiple,
                             model.weight_placeholder: batch_weight,
+                            model.sbert_placeholder: sbert_vec,
                         },
                     )
 
@@ -185,6 +188,7 @@ def train():
                     validation_labels,
                     validation_weights,
                 ) = _batch_predict_with_a_model(validation_data, model, session=sess)
+
                 validation_acc, validation_sum = sess.run(
                     [model.final_accuracy, model.vaccuracy_summary],
                     feed_dict={
@@ -309,8 +313,20 @@ def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
             batch_oracle_multiple,
             batch_reward_multiple,
         ) = data.get_batch(((step - 1) * FLAGS.batch_size), (step * FLAGS.batch_size))
+        
+        sbert_shape = (
+            FLAGS.batch_size,
+            FLAGS.max_doc_length,
+            FLAGS.sentembed_size,
+        )
+        sbert_vec = np.ones(sbert_shape, dtype=np.float32)
+                
         batch_logits = session.run(
-            model.logits, feed_dict={model.document_placeholder: batch_docs}
+            model.logits, 
+            feed_dict={
+                model.document_placeholder: batch_docs,
+                model.sbert_placeholder: sbert_vec,
+            }
         )
 
         data_logits.append(batch_logits)
