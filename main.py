@@ -156,7 +156,7 @@ def train():
                             model.predicted_multisample_label_placeholder: batch_oracle_multiple,
                             model.actual_reward_multisample_placeholder: batch_reward_multiple,
                             model.weight_placeholder: batch_weight,
-                            model.sbert_placeholder: sbert_vec,
+                            model.sbert_placeholder: batch_sbert_vec,
                         },
                     )
 
