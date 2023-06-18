@@ -202,25 +202,6 @@ def policy_network(
             
         # 3. Create convolution layer (sentence encoder)
         with tf.variable_scope("ConvLayer") as scope:
-            # [document length, sentence length, word embedding length]
-            # example:
-            # [
-            #   sent1[
-            #       word1[],
-            #       word2[]
-            #   ],
-            #   sent2[
-            #       word1[],
-            #       word2[]
-            #   ],
-            # ]
-            print(
-                "FLAGS.max_sent_length shape: %s" % str(FLAGS.max_sent_length)
-            )
-            print(
-                "FLAGS.wordembed_size shape: %s" % str(FLAGS.wordembed_size)
-            )        
-
             document_word_embedding = tf.reshape(
                 document_word_embedding,
                 [-1, FLAGS.max_sent_length, FLAGS.wordembed_size],
@@ -239,19 +220,10 @@ def policy_network(
                 ],
             )
 
-            # INI YANG BISA DIGANTI DENGAN SBERT!!!!       
-            # print(document_sent_embedding)
-            # document_sent_embedding = sbert_placeholder
-            # print(
-            #     "document_sent_embedding = sbert_placeholder: %s"
-            #     % str(sbert_placeholder.get_shape())
-            # )
-            # print(document_sent_embedding)
-            
         # 4. Reshape sentence embedding
         with variable_scope.variable_scope("ReshapeDoc_TensorToList"):
             document_sent_embedding = reshape_tensor2list(
-                document_sent_embedding,
+                document_sent_embedding, # to be updated with sbert_placeholder
                 FLAGS.max_doc_length,
                 FLAGS.sentembed_size,
             )
