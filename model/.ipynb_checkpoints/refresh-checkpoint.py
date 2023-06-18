@@ -64,31 +64,7 @@ class Refresh:
                 FLAGS.max_doc_length,
                 FLAGS.sentembed_size,
             ],
-            name="mocksbert-ph",
-        )
-            
-        # 3. Weight placeholder
-        self.weight_placeholder = tf.placeholder(
-            dtype, [None, FLAGS.max_doc_length], name="weight-ph"
-        )
-
-        # 4. Reward placeholder
-        self.actual_reward_multisample_placeholder = tf.placeholder(
-            dtype, [None, 1], name="actual-reward-multisample-ph"
-        )
-
-        # 5. Predicted label placeholder
-        self.predicted_multisample_label_placeholder = tf.placeholder(
-            dtype,
-            [None, 1, FLAGS.max_doc_length, FLAGS.target_label_size],
-            name="pred-multisample-label-ph",
-        )
-
-        # 6. Logit placeholder for validation and test
-        self.logits_placeholder = tf.placeholder(
-            dtype,
-            [None, FLAGS.max_doc_length, FLAGS.target_label_size],
-            name="logits-ph",
+            name="sbertvec-ph",
         )
 
         # 7. Define Policy Core Network: Consists of Encoder, Decoder and Convolution
@@ -99,10 +75,28 @@ class Refresh:
             self.sbert_placeholder,
         )
 
+        # 5. Predicted label placeholder
+        self.predicted_multisample_label_placeholder = tf.placeholder(
+            dtype,
+            [None, 1, FLAGS.max_doc_length, FLAGS.target_label_size],
+            name="pred-multisample-label-ph",
+        )
+
+        # 4. Reward placeholder
+        self.actual_reward_multisample_placeholder = tf.placeholder(
+            dtype, [None, 1], name="actual-reward-multisample-ph"
+        )
+
+        # 3. Weight placeholder
+        self.weight_placeholder = tf.placeholder(
+            dtype, [None, FLAGS.max_doc_length], name="weight-ph"
+        )
+
         # 8. Define Reward-Weighted Cross Entropy Loss
+        # bagian ini harusnya gak perlu diubah lagi
         self.rewardweighted_cross_entropy_loss_multisample = (
             model_docsum.reward_weighted_cross_entropy_loss_multisample(
-                self.logits,
+                self.logits, # ini akan teradjust dengan menggunakan SBERT
                 self.predicted_multisample_label_placeholder,
                 self.actual_reward_multisample_placeholder,
                 self.weight_placeholder,
@@ -118,6 +112,14 @@ class Refresh:
         self.accuracy = model_docsum.accuracy(
             self.logits, self.label_placeholder, self.weight_placeholder
         )
+
+        # 6. Logit placeholder for validation and test
+        self.logits_placeholder = tf.placeholder(
+            dtype,
+            [None, FLAGS.max_doc_length, FLAGS.target_label_size],
+            name="logits-ph",
+        )
+
         self.final_accuracy = model_docsum.accuracy(
             self.logits_placeholder, self.label_placeholder, self.weight_placeholder
         )

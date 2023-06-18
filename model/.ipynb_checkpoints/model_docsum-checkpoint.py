@@ -192,11 +192,7 @@ def policy_network(
                 document_word_embedding,
                 [
                     -1,
-                    (
-                        FLAGS.max_doc_length
-                        + FLAGS.max_title_length
-                        + FLAGS.max_image_length
-                    ),
+                    FLAGS.max_doc_length,
                     FLAGS.max_sent_length,
                     FLAGS.wordembed_size,
                 ],
@@ -210,11 +206,11 @@ def policy_network(
             # [document length, sentence length, word embedding length]
             # example:
             # [
-            #   doc1[
+            #   sent1[
             #       word1[],
             #       word2[]
             #   ],
-            #   doc2[
+            #   sent2[
             #       word1[],
             #       word2[]
             #   ],
@@ -235,102 +231,45 @@ def policy_network(
                 document_word_embedding
             )  # [None, sentembed_size]
 
-            print(
-                "document_word_embedding shape 2: %s" % str(document_word_embedding.get_shape())
-            )
-            print(
-                "document_sent_embedding shape: %s" % str(document_sent_embedding.get_shape())
-            )
-
-            
-            # document_sent_embedding = (batch_size, doc_length, sent_embedding_length)
             document_sent_embedding = tf.reshape(
                 document_sent_embedding,
                 [
                     -1,
-                    (
-                        FLAGS.max_doc_length
-                        + FLAGS.max_title_length
-                        + FLAGS.max_image_length
-                    ),
+                    FLAGS.max_doc_length,
                     FLAGS.sentembed_size,
                 ],
             )
-            print(
-                "document_sent_embedding after reshape: %s"
-                % str(document_sent_embedding.get_shape())
-            )
-            
+
             # INI YANG BISA DIGANTI DENGAN SBERT!!!!       
-#             document_sent_embedding = sbert_placeholder
-#             print(
-#                 "document_sent_embedding mock: %s"
-#                 % str(document_sent_embedding.get_shape())
-#             )
+            # print(document_sent_embedding)
+            # document_sent_embedding = sbert_placeholder
+            # print(
+            #     "document_sent_embedding = sbert_placeholder: %s"
+            #     % str(sbert_placeholder.get_shape())
+            # )
+            # print(document_sent_embedding)
             
         # 4. Reshape sentence embedding
-        # [-1, (max_doc_length+max_title_length+max_image_length), sentembed_size]
-        # -> List of [-1, sentembed_size]
         with variable_scope.variable_scope("ReshapeDoc_TensorToList"):
             document_sent_embedding = reshape_tensor2list(
                 document_sent_embedding,
-                (
-                    FLAGS.max_doc_length
-                    + FLAGS.max_title_length
-                    + FLAGS.max_image_length
-                ),
+                FLAGS.max_doc_length,
                 FLAGS.sentembed_size,
             )
-            print(
-                "document_sent_embedding after reshape_tensor2list: %s"
-                % str(len(document_sent_embedding))
-            )
-        document_sents_enc = document_sent_embedding[: FLAGS.max_doc_length]
-        print("document_sents_enc[0] shape: %s" % str(document_sents_enc[0].get_shape()))
-
-        if FLAGS.doc_encoder_reverse:
-            document_sents_enc = document_sents_enc[::-1]
-        document_sents_ext = document_sent_embedding[: FLAGS.max_doc_length]
-        document_sents_titimg = document_sent_embedding[FLAGS.max_doc_length :]
-        
-        # document_word_embedding shape 1: (?, 110, 20, 100) -> (batch_size, doc_length, sent_length, wordembed_size)
-        # FLAGS.max_sent_length shape: 20
-        # FLAGS.wordembed_size shape: 100
-        # document_word_embedding shape 2: (?, 20, 100) -> (batch_size * doc_length, sent_length, wordembed_size)
-        # document_sent_embedding shape: (?, 250)
-        # document_sent_embedding after reshape: (?, 110, 250) -> (batch_size, doc_length, sent_embedding_length)
-        # document_sent_embedding after reshape_tensor2list: 110 -> doc_length
-        # document_sents_enc[0] shape: (?, 250)
 
         # 5. Create document encoder
+        document_sents_enc = document_sent_embedding[: FLAGS.max_doc_length]
+        document_sents_enc = document_sents_enc[::-1]
+        document_sents_ext = document_sent_embedding[: FLAGS.max_doc_length]
         with tf.variable_scope("DocEnc") as scope:
-            encoder_outputs, encoder_state = simple_rnn(document_sents_enc)
+            _, encoder_state = simple_rnn(document_sents_enc)
 
         # 6. Create sentence extractor
         with tf.variable_scope("SentExt") as scope:
-            if (FLAGS.attend_encoder) and (len(document_sents_titimg) != 0):
-                # Multiple decoder
-                print("Multiple decoder is not implement yet.")
-                exit(0)
-            elif (FLAGS.attend_encoder) and (len(document_sents_titimg) == 0):
-                # JP model: attend encoder
-                extractor_output, logits = sentence_extractor_seqrnn_docatt(
-                    document_sents_ext,
-                    encoder_outputs,
-                    encoder_state,
-                    label_placeholder,
-                )
-            elif (not FLAGS.attend_encoder) and (len(document_sents_titimg) != 0):
-                # Attend only titimages during decoding
-                extractor_output, logits = sentence_extractor_nonseqrnn_titimgatt(
-                    document_sents_ext, encoder_state, document_sents_titimg
-                )
-            else:
-                print("attend nothing")
-                # Attend nothing
-                extractor_output, logits = sentence_extractor_nonseqrnn_noatt(
-                    document_sents_ext, encoder_state
-                )
+            # Attend nothing
+            extractor_output, logits = sentence_extractor_nonseqrnn_noatt(
+                document_sents_ext, encoder_state
+            )
 
     return extractor_output, logits
 

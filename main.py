@@ -47,7 +47,7 @@ def train():
         config = tf.ConfigProto(allow_soft_placement=True)
         with tf.Session(config=config) as sess:
             # 1. Prepare vocab dict (map from word to vector)
-            
+
             (
                 vocab_dict,
                 word_embedding_array,
@@ -71,7 +71,6 @@ def train():
             sess.run(model.vocab_embed_variable.assign(word_embedding_array))
 
             # 6. Run epoch:
-            print("RUNNING EPOCH >>>>>>>>>>>>")
             start_epoch = 1
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
                 # 7. Create new or read existing rouge dict
@@ -82,11 +81,7 @@ def train():
 
                 # 9. Create batch data and start batch training
                 step = 1
-                print("CREATING BATCH DATA >>>>>>>>")
-                print("step * FLAGS.batch_size", step * FLAGS.batch_size)
-                print("len(train_data.fileindices)", len(train_data.fileindices))
                 while (step * FLAGS.batch_size) <= len(train_data.fileindices):
-                    print("MASUK KE WHILE CREATING BATCH DATA >>>>>>>")
                     (
                         _,
                         batch_docs,
@@ -98,44 +93,36 @@ def train():
                         ((step - 1) * FLAGS.batch_size), (step * FLAGS.batch_size)
                     )
 
-                    print("batch_docs >>>>")
-                    print(batch_docs.shape)
-                    
-                    print("batch_label >>>>")
-                    print(batch_label.shape)
-                    
-                    print("batch_weight >>>>")
-                    print(batch_weight.shape)
-                    
-                    print("batch_oracle_multiple >>>>")
-                    print(batch_oracle_multiple.shape)
-                    
-                    print("batch_reward_multiple >>>>")
-                    print(batch_reward_multiple.shape)
-                                        
-                    sbert_shape = (FLAGS.batch_size, FLAGS.max_doc_length, FLAGS.sentembed_size)
+                    sbert_shape = (
+                        FLAGS.batch_size,
+                        FLAGS.max_doc_length,
+                        FLAGS.sentembed_size,
+                    )
                     sbert_vec = np.ones(sbert_shape, dtype=np.float32)
-                    print("sbert_vec >>>>")
-                    print(sbert_vec.shape)
-                    print(sbert_vec)     
-                    
+
                     # Print the progress
                     if (step % FLAGS.training_checkpoint) == 0:
+                        feed_dict = {
+                            model.document_placeholder: batch_docs,
+                            model.predicted_multisample_label_placeholder: batch_oracle_multiple,
+                            model.actual_reward_multisample_placeholder: batch_reward_multiple,
+                            model.label_placeholder: batch_label,
+                            model.weight_placeholder: batch_weight,
+                            model.sbert_placeholder: sbert_vec,
+                        }
+                        
+                        print("EVAL LOGITS >>>>>>>>>>>>>>>>")
+                        print(model.logits.get_shape())
+                        print(sess.run(model.logits, feed_dict=feed_dict))
+                        
                         ce_loss_val, ce_loss_sum, acc_val, acc_sum = sess.run(
                             [
-                                model.rewardweighted_cross_entropy_loss_multisample, # train_op to be optimized
-                                model.rewardweighted_ce_multisample_loss_summary, # train_op summary
-                                model.accuracy, # return accuracy / model performance in this batch
-                                model.taccuracy_summary, # return accuracy / model performance summary in this batch
+                                model.rewardweighted_cross_entropy_loss_multisample,  # train_op to be optimized
+                                model.rewardweighted_ce_multisample_loss_summary,  # train_op summary
+                                model.accuracy,  # return accuracy / model performance in this batch
+                                model.taccuracy_summary,  # return accuracy / model performance summary in this batch
                             ],
-                            feed_dict={
-                                model.document_placeholder: batch_docs,
-                                model.predicted_multisample_label_placeholder: batch_oracle_multiple,
-                                model.actual_reward_multisample_placeholder: batch_reward_multiple,
-                                model.label_placeholder: batch_label,
-                                model.weight_placeholder: batch_weight,
-                                model.sbert_placeholder: sbert_vec,
-                            },
+                            feed_dict=feed_dict,
                         )
 
                         # Print Summary to Tensor Board
@@ -211,7 +198,7 @@ def train():
                 )
 
                 # 14. Print rouge score for this epoch's summary
-                # The output of the convert_and_evaluate function when used on multiple documents 
+                # The output of the convert_and_evaluate function when used on multiple documents
                 # is a dictionary containing the average ROUGE scores across all documents.
                 validation_data.write_prediction_summaries(
                     validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
@@ -224,7 +211,10 @@ def train():
                     "validation",
                 )
 
-                print("Average ROUGE score across all documents for this epoch:",  rouge_score)
+                print(
+                    "Average ROUGE score across all documents for this epoch:",
+                    rouge_score,
+                )
 
 
 def test():
@@ -239,7 +229,6 @@ def test():
 
         # Start a session
         with tf.Session(config=config) as sess:
-
             ### Prepare data for training
             print("Prepare vocab dict and read pretrained word embeddings ...")
             (
@@ -305,7 +294,6 @@ def test():
 
 
 def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
-
     data_logits = []
     data_labels = []
     data_weights = []
