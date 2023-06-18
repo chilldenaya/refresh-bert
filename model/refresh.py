@@ -71,7 +71,6 @@ class Refresh:
         self.extractor_output, self.logits = model_docsum.policy_network(
             self.vocab_embed_variable, 
             self.document_placeholder, 
-            self.label_placeholder,
             self.sbert_placeholder,
         )
 
