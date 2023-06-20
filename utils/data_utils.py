@@ -31,7 +31,7 @@ class Data:
         self.docs = []
         self.titles = []
         self.images = []
-        self.labels = []  # [ d1[[1, 19, 25], [1 19]], d2[[20 27 43], [20 27 35]] ]
+        self.labels = []
         self.rewards = []
         self.weights = []
 
@@ -180,13 +180,10 @@ class Data:
             dtype=dtype,
         )
         batch_reward_multiple = np.empty(((endidx - startidx), 1), dtype=dtype)
-
-        sbert_shape = (
-            (endidx - startidx),
-            FLAGS.max_doc_length,
-            FLAGS.sentembed_size,
+        batch_sbert_vec = np.ones(
+            ((endidx - startidx), 1, FLAGS.max_doc_length, FLAGS.target_label_size), 
+            dtype=dtype
         )
-        batch_sbert_vec = np.ones(sbert_shape, dtype=np.float32)
 
         # 2. For every file in the batch:
         batch_idx = 0
@@ -376,7 +373,7 @@ class Data:
             doc_data_list, title_data_list, image_data_list, label_data_list
         ):
             # 3. Get all sentences in a document
-            doc_lines = doc_data.strip().split("\n")
+            doc_lines = doc_data.strip().split("\n") # line sentence
             title_lines = title_data.strip().split("\n")
             image_lines = image_data.strip().split("\n")
             label_lines = label_data.strip().split("\n")
@@ -395,7 +392,7 @@ class Data:
                 # self.docs = [[d1s1, d1s2, ... , d1sn], [d2s1, d2s2, ... , d2sn]]
                 thisdoc = []
                 for line in doc_lines[1 : FLAGS.max_doc_length + 1]:
-                    thissent = [int(item) for item in line.strip().split()]
+                    thissent = [int(item) for item in line.strip().split()] # sentence [w1, w2, ...]
                     thisdoc.append(thissent)
                 self.docs.append(thisdoc)
 
