@@ -34,6 +34,7 @@ class Data:
         self.labels = []
         self.rewards = []
         self.weights = []
+        self.sbert_vecs = []
 
         self.fileindices = []
 
@@ -184,10 +185,14 @@ class Data:
             dtype=dtype,
         )
         batch_reward_multiple = np.empty(((endidx - startidx), 1), dtype=dtype)
-        batch_sbert_vec = np.ones(
+        batch_sbert_vec = np.empty(
             ((endidx - startidx), FLAGS.max_doc_length, FLAGS.sentembed_size), 
-            dtype=dtype
+            dtype=dtype,
         )
+        # batch_sbert_vec = np.ones(
+        #     ((endidx - startidx), FLAGS.max_doc_length, FLAGS.sentembed_size), 
+        #     dtype=dtype
+        # )
 
         # 2. For every file in the batch:
         batch_idx = 0
@@ -215,12 +220,24 @@ class Data:
                 for item in range(FLAGS.max_doc_length)
             ]
             batch_label[batch_idx] = np.array(labels_vecs[:], dtype=dtype)
+            
 
             # 6. Set batch weights
             weights = process_to_chop_pad(
                 self.weights[fileindex][:], FLAGS.max_doc_length
             )
             batch_weight[batch_idx] = np.array(weights[:], dtype=dtype)
+
+            sent_docids = []
+            for idx in range(FLAGS.max_doc_length):
+                thissent = []
+                if idx < len(self.sbert_vecs[fileindex]):
+                    thissent = self.sbert_vecs[fileindex][idx][:]
+                thissent = process_to_chop_pad(
+                    thissent, FLAGS.sentembed_size
+                )  # [FLAGS.max_sent_length]
+                sent_docids.append(thissent)
+            batch_sbert_vec[batch_idx] = np.array(sent_docids[:], dtype=dtype)
 
             # 7. Set multiple oracle and rewards
             labels_set = (
@@ -370,17 +387,21 @@ class Data:
             .strip()
             .split("\n\n")
         )
+        sbert_data_list = (
+            open(full_data_file_prefix + ".sbert").read().strip().split("\n\n")
+        )
 
         # 2. For every document in documents:
         doccount = 0
-        for doc_data, title_data, image_data, label_data in zip(
-            doc_data_list, title_data_list, image_data_list, label_data_list
+        for doc_data, title_data, image_data, label_data, sbert_data in zip(
+            doc_data_list, title_data_list, image_data_list, label_data_list, sbert_data_list
         ):
             # 3. Get all sentences in a document
             doc_lines = doc_data.strip().split("\n") # line sentence
             title_lines = title_data.strip().split("\n")
             image_lines = image_data.strip().split("\n")
             label_lines = label_data.strip().split("\n")
+            sbert_lines = sbert_data.strip().split("\n")
 
             filename = doc_lines[0].strip()
 
@@ -389,6 +410,7 @@ class Data:
                 (filename == title_lines[0].strip())
                 and (filename == image_lines[0].strip())
                 and (filename == label_lines[0].strip())
+                and (filename == sbert_lines[0].strip())
             ):
                 self.filenames.append(filename)
 
@@ -427,6 +449,13 @@ class Data:
                     thisreward.append(float(line.split()[-1]))
                 self.labels.append(thislabel)  # [[1, 19, 25], [1 19]]
                 self.rewards.append(thisreward)  # [0.555, 0.0508]
+
+                thissbert = []
+                for embedding_per_sentence_in_docs_str in sbert_lines[1 : FLAGS.max_doc_length + 1]:
+                    thissent_vec = [float(item) for item in embedding_per_sentence_in_docs_str.strip().split()] # 1 sentence
+                    thissbert.append(thissent_vec) # semua sentence dalam dokumen
+                self.sbert_vecs.append(thissbert) # semua dokumen
+
             else:
                 print("Some problem with %s.* files. Exiting!" % full_data_file_prefix)
                 exit(0)
