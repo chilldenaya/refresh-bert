@@ -165,7 +165,11 @@ class Data:
         # 1. Initialize batch docnames, docs, label, weight, oracle, and reward variables
         batch_docnames = np.empty((endidx - startidx), dtype="S60")
         batch_docs = np.empty(
-            (endidx - startidx),
+            (
+                (endidx - startidx),
+                FLAGS.max_doc_length,
+                FLAGS.max_sent_length,
+            ),
             dtype="int32",
         )
         batch_label = np.empty(
@@ -181,7 +185,7 @@ class Data:
         )
         batch_reward_multiple = np.empty(((endidx - startidx), 1), dtype=dtype)
         batch_sbert_vec = np.ones(
-            ((endidx - startidx), 1, FLAGS.max_doc_length, FLAGS.target_label_size), 
+            ((endidx - startidx), FLAGS.max_doc_length, FLAGS.sentembed_size), 
             dtype=dtype
         )
 
