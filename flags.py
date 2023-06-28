@@ -109,7 +109,7 @@ tf.app.flags.DEFINE_boolean(
 )  # Not used, always use fscore
 
 tf.app.flags.DEFINE_integer(
-    "train_epoch_wce", 2, "Number of training epochs per step."
+    "train_epoch_wce", 5, "Number of training epochs per step."
 )
 
 tf.app.flags.DEFINE_integer(

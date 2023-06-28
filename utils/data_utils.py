@@ -464,7 +464,7 @@ class Data:
                 print("%d ..." % doccount)
 
             doccount += 1
-            if doccount == 20:
+            if doccount == 4999:
                 break
 
         # Set Fileindices
