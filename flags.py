@@ -165,10 +165,10 @@ tf.app.flags.DEFINE_string(
 )
 
 tf.app.flags.DEFINE_boolean(
-    "is_use_sbert", False, "use SBERT as sentence embeddings."
+    "is_use_sbert", True, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_integer("doc_num", 4999, "Size of document in dataset used.")
+tf.app.flags.DEFINE_integer("doc_num", 20, "Size of document in dataset used.")
 
 
 ############ Create FLAGS
