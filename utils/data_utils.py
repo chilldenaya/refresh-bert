@@ -224,16 +224,17 @@ class Data:
             )
             batch_weight[batch_idx] = np.array(weights[:], dtype=dtype)
 
-            sent_docids = []
-            for idx in range(FLAGS.max_doc_length):
-                thissent = []
-                if idx < len(self.sbert_vecs[fileindex]):
-                    thissent = self.sbert_vecs[fileindex][idx][:]
-                thissent = process_to_chop_pad(
-                    thissent, FLAGS.sentembed_size
-                )  # [FLAGS.max_sent_length]
-                sent_docids.append(thissent)
-            batch_sbert_vec[batch_idx] = np.array(sent_docids[:], dtype=dtype)
+            if FLAGS.is_use_sbert:
+                sent_docids = []
+                for idx in range(FLAGS.max_doc_length):
+                    thissent = []
+                    if idx < len(self.sbert_vecs[fileindex]):
+                        thissent = self.sbert_vecs[fileindex][idx][:]
+                    thissent = process_to_chop_pad(
+                        thissent, FLAGS.sentembed_size
+                    )  # [FLAGS.max_sent_length]
+                    sent_docids.append(thissent)
+                batch_sbert_vec[batch_idx] = np.array(sent_docids[:], dtype=dtype)
 
             # 7. Set multiple oracle and rewards
             labels_set = (

@@ -69,7 +69,8 @@ def train():
             model = Refresh(sess, len(vocab_dict) - 2)
 
             # 5. Assign word embedding to model using vocab dict created in step 1
-            sess.run(model.vocab_embed_variable.assign(word_embedding_array))
+            if not FLAGS.is_use_sbert:
+                sess.run(model.vocab_embed_variable.assign(word_embedding_array))
 
             # 6. Run epoch:
             start_epoch = 1

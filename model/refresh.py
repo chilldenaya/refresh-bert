@@ -35,7 +35,9 @@ class Refresh:
         dtype = tf.float16 if FLAGS.use_fp16 else tf.float32
 
         # 1. Word embeddings
-        self.vocab_embed_variable = model_utils.get_vocab_embed_variable(vocab_size)
+        self.vocab_embed_variable = None
+        if not FLAGS.is_use_sbert:
+            self.vocab_embed_variable = model_utils.get_vocab_embed_variable(vocab_size)
 
         # 2. Document placeholder
         self.document_placeholder = tf.placeholder(
