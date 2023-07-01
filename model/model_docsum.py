@@ -164,64 +164,68 @@ def policy_network(
     """
 
     with tf.variable_scope("PolicyNetwork") as scope:
-        # 1. Define word embeddings
-        pad_embed_variable = variable_on_cpu(
-            "pad_embed",
-            [1, FLAGS.wordembed_size],
-            tf.constant_initializer(0),
-            trainable=False,
-        )
-        unk_embed_variable = variable_on_cpu(
-            "unk_embed",
-            [1, FLAGS.wordembed_size],
-            tf.constant_initializer(0),
-            trainable=True,
-        )
-        fullvocab_embed_variable = tf.concat(
-            0, [pad_embed_variable, unk_embed_variable, vocab_embed_variable]
-        )
-
-        # 2. Create lookup layer
-        with tf.variable_scope("Lookup") as scope:
-            document_placeholder_flat = tf.reshape(document_placeholder, [-1])
-            document_word_embedding = tf.nn.embedding_lookup(
-                fullvocab_embed_variable, document_placeholder_flat, name="Lookup"
-            )
-            document_word_embedding = tf.reshape(
-                document_word_embedding,
-                [
-                    -1,
-                    FLAGS.max_doc_length,
-                    FLAGS.max_sent_length,
-                    FLAGS.wordembed_size,
-                ],
-            )
-
         # 3. Create convolution layer (sentence encoder)
-        with tf.variable_scope("ConvLayer") as scope:
-            document_word_embedding = tf.reshape(
-                document_word_embedding,
-                [-1, FLAGS.max_sent_length, FLAGS.wordembed_size],
+        if FLAGS.is_use_sbert:
+            sent_embedding = sbert_placeholder
+        else:
+            # 1. Define word embeddings
+            pad_embed_variable = variable_on_cpu(
+                "pad_embed",
+                [1, FLAGS.wordembed_size],
+                tf.constant_initializer(0),
+                trainable=False,
+            )
+            unk_embed_variable = variable_on_cpu(
+                "unk_embed",
+                [1, FLAGS.wordembed_size],
+                tf.constant_initializer(0),
+                trainable=True,
+            )
+            fullvocab_embed_variable = tf.concat(
+                0, [pad_embed_variable, unk_embed_variable, vocab_embed_variable]
             )
 
-            document_sent_embedding = conv1d_layer_sentence_representation(
-                document_word_embedding
-            )  # [None, sentembed_size]
+            # 2. Create lookup layer
+            with tf.variable_scope("Lookup") as scope:
+                document_placeholder_flat = tf.reshape(document_placeholder, [-1])
+                document_word_embedding = tf.nn.embedding_lookup(
+                    fullvocab_embed_variable, document_placeholder_flat, name="Lookup"
+                )
+                document_word_embedding = tf.reshape(
+                    document_word_embedding,
+                    [
+                        -1,
+                        FLAGS.max_doc_length,
+                        FLAGS.max_sent_length,
+                        FLAGS.wordembed_size,
+                    ],
+                )
 
-            document_sent_embedding = tf.reshape(
-                document_sent_embedding,
-                [
-                    -1,
-                    FLAGS.max_doc_length,
-                    FLAGS.sentembed_size,
-                ],
-            )
+            with tf.variable_scope("ConvLayer") as scope:
+                document_word_embedding = tf.reshape(
+                    document_word_embedding,
+                    [-1, FLAGS.max_sent_length, FLAGS.wordembed_size],
+                )
+
+                document_sent_embedding = conv1d_layer_sentence_representation(
+                    document_word_embedding
+                )  # [None, sentembed_size]
+
+                document_sent_embedding = tf.reshape(
+                    document_sent_embedding,
+                    [
+                        -1,
+                        FLAGS.max_doc_length,
+                        FLAGS.sentembed_size,
+                    ],
+                )
+            
+                sent_embedding = document_sent_embedding
 
         # 4. Reshape sentence embedding
         with variable_scope.variable_scope("ReshapeDoc_TensorToList"):
             document_sent_embedding = reshape_tensor2list(
-#                 document_sent_embedding, 
-                sbert_placeholder, # to be updated with sbert_placeholder
+                sent_embedding,
                 FLAGS.max_doc_length,
                 FLAGS.sentembed_size,
             )

@@ -35,18 +35,16 @@ class Refresh:
         dtype = tf.float16 if FLAGS.use_fp16 else tf.float32
 
         # 1. Word embeddings
-        self.vocab_embed_variable = model_utils.get_vocab_embed_variable(vocab_size)
+        self.vocab_embed_variable = None
+        if not FLAGS.is_use_sbert:
+            self.vocab_embed_variable = model_utils.get_vocab_embed_variable(vocab_size)
 
         # 2. Document placeholder
         self.document_placeholder = tf.placeholder(
             "int32",
             [
                 None,
-                (
-                    FLAGS.max_doc_length
-                    + FLAGS.max_title_length
-                    + FLAGS.max_image_length
-                ),
+                FLAGS.max_doc_length,
                 FLAGS.max_sent_length,
             ],
             name="doc-ph",
@@ -92,10 +90,9 @@ class Refresh:
         )
 
         # 8. Define Reward-Weighted Cross Entropy Loss
-        # bagian ini harusnya gak perlu diubah lagi
         self.rewardweighted_cross_entropy_loss_multisample = (
             model_docsum.reward_weighted_cross_entropy_loss_multisample(
-                self.logits, # ini akan teradjust dengan menggunakan SBERT
+                self.logits,
                 self.predicted_multisample_label_placeholder,
                 self.actual_reward_multisample_placeholder,
                 self.weight_placeholder,

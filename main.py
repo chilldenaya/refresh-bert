@@ -47,10 +47,12 @@ def train():
         with tf.Session(config=config) as sess:
             # 1. Prepare vocab dict (map from word to vector)
 
-            (
-                vocab_dict,
-                word_embedding_array,
-            ) = DataProcessor().prepare_vocab_embeddingdict()
+            vocab_dict = {}
+            if not FLAGS.is_use_sbert:
+                (
+                    vocab_dict,
+                    word_embedding_array,
+                ) = DataProcessor().prepare_vocab_embeddingdict()
 
             # 2. Prepare data for training and validation
             train_data = DataProcessor().prepare_news_data(
@@ -67,7 +69,8 @@ def train():
             model = Refresh(sess, len(vocab_dict) - 2)
 
             # 5. Assign word embedding to model using vocab dict created in step 1
-            sess.run(model.vocab_embed_variable.assign(word_embedding_array))
+            if not FLAGS.is_use_sbert:
+                sess.run(model.vocab_embed_variable.assign(word_embedding_array))
 
             # 6. Run epoch:
             start_epoch = 1
