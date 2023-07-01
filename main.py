@@ -47,10 +47,12 @@ def train():
         with tf.Session(config=config) as sess:
             # 1. Prepare vocab dict (map from word to vector)
 
-            (
-                vocab_dict,
-                word_embedding_array,
-            ) = DataProcessor().prepare_vocab_embeddingdict()
+            vocab_dict = {}
+            if not FLAGS.is_use_sbert:
+                (
+                    vocab_dict,
+                    word_embedding_array,
+                ) = DataProcessor().prepare_vocab_embeddingdict()
 
             # 2. Prepare data for training and validation
             train_data = DataProcessor().prepare_news_data(

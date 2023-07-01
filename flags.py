@@ -164,5 +164,12 @@ tf.app.flags.DEFINE_string(
     "Directory where document sentences are kept.",
 )
 
+tf.app.flags.DEFINE_boolean(
+    "is_use_sbert", False, "use SBERT as sentence embeddings."
+)
+
+tf.app.flags.DEFINE_integer("doc_num", 4999, "Size of document in dataset used.")
+
+
 ############ Create FLAGS
 FLAGS = tf.app.flags.FLAGS
