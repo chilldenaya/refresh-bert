@@ -137,7 +137,7 @@ def train():
                             "MRT: Epoch "
                             + str(epoch)
                             + "/"
-                            + str(FLAGS.train_epoch_wce + 1)
+                            + str(FLAGS.train_epoch_wce)
                             + " : Covered "
                             + str(step * FLAGS.batch_size)
                             + "/"
@@ -194,21 +194,21 @@ def train():
                 # 14. Print rouge score for this epoch's summary
                 # The output of the convert_and_evaluate function when used on multiple documents
                 # is a dictionary containing the average ROUGE scores across all documents.
-                validation_data.write_prediction_summaries(
-                    validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
-                )
-                rouge_score = rouge_generator.get_full_rouge(
-                    FLAGS.train_dir
-                    + "/model.ckpt.epoch-"
-                    + str(epoch)
-                    + ".validation-summary-topranked",
-                    "validation",
-                )
+                # validation_data.write_prediction_summaries(
+                #     validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
+                # )
+                # rouge_score = rouge_generator.get_full_rouge(
+                #     FLAGS.train_dir
+                #     + "/model.ckpt.epoch-"
+                #     + str(epoch)
+                #     + ".validation-summary-topranked",
+                #     "validation",
+                # )
 
-                print(
-                    "Average ROUGE score across all documents for this epoch:",
-                    rouge_score,
-                )
+                # print(
+                #     "Average ROUGE score across all documents for this epoch:",
+                #     rouge_score,
+                # )
 
 
 def test():

@@ -33,7 +33,7 @@ tf.app.flags.DEFINE_integer("model_to_load", 100, "Model to load for testing.")
 
 tf.app.flags.DEFINE_boolean("use_fp16", False, "Use fp16 instead of fp32.")
 
-tf.app.flags.DEFINE_string("data_mode", "cnn", "cnn or dailymail or cnn-dailymail")
+tf.app.flags.DEFINE_string("data_mode", "liputan6", "cnn or dailymail or cnn-dailymail")
 
 ### Pretrained wordembeddings features
 
@@ -109,10 +109,6 @@ tf.app.flags.DEFINE_boolean(
 )  # Not used, always use fscore
 
 tf.app.flags.DEFINE_integer(
-    "train_epoch_wce", 5, "Number of training epochs per step."
-)
-
-tf.app.flags.DEFINE_integer(
     "num_sample_rollout", 10, "Number of Multiple Oracles Used."
 )  # default 10
 
@@ -168,8 +164,11 @@ tf.app.flags.DEFINE_boolean(
     "is_use_sbert", True, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_integer("doc_num", 20, "Size of document in dataset used.")
+tf.app.flags.DEFINE_integer("doc_num", 50, "Size of document in dataset used.")
 
+tf.app.flags.DEFINE_integer(
+    "train_epoch_wce", 2, "Number of training epochs per step."
+)
 
 ############ Create FLAGS
 FLAGS = tf.app.flags.FLAGS
