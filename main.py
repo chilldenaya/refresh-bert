@@ -194,9 +194,10 @@ def train():
                 # 14. Print rouge score for this epoch's summary
                 # The output of the convert_and_evaluate function when used on multiple documents
                 # is a dictionary containing the average ROUGE scores across all documents.
-                # validation_data.write_prediction_summaries(
-                #     validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
-                # )
+                validation_data.write_prediction_summaries(
+                    validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
+                )
+
                 # rouge_score = rouge_generator.get_full_rouge(
                 #     FLAGS.train_dir
                 #     + "/model.ckpt.epoch-"
