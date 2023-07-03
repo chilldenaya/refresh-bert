@@ -124,7 +124,7 @@ class Data:
                 FLAGS.doc_sentence_directory
                 + "/"
                 + self.data_type
-                + "/mainbody/"
+                + "/"
                 + fileid
                 + ".mainbody"
             )

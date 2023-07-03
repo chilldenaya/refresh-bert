@@ -198,18 +198,18 @@ def train():
                     validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
                 )
 
-                # rouge_score = rouge_generator.get_full_rouge(
-                #     FLAGS.train_dir
-                #     + "/model.ckpt.epoch-"
-                #     + str(epoch)
-                #     + ".validation-summary-topranked",
-                #     "validation",
-                # )
+                rouge_score = rouge_generator.get_full_rouge(
+                    FLAGS.train_dir
+                    + "/model.ckpt.epoch-"
+                    + str(epoch)
+                    + ".validation-summary-topranked",
+                    "validation",
+                )
 
-                # print(
-                #     "Average ROUGE score across all documents for this epoch:",
-                #     rouge_score,
-                # )
+                print(
+                    "Average ROUGE score across all documents for this epoch:",
+                    rouge_score,
+                )
 
 
 def test():

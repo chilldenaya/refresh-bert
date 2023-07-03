@@ -156,7 +156,7 @@ tf.app.flags.DEFINE_string(
 
 tf.app.flags.DEFINE_string(
     "doc_sentence_directory",
-    "./data/CNN-DM-Filtered-TokenizedSegmented",
+    "./data/Liputan6-Filtered-TokenizedSegmented",
     "Directory where document sentences are kept.",
 )
 
