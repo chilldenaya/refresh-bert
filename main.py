@@ -74,6 +74,7 @@ def train():
 
             # 6. Run epoch:
             start_epoch = 1
+            rouge_scores = []
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
                 # 7. Create new or read existing rouge dict
                 rouge_generator.restore_rouge_dict()
@@ -205,12 +206,17 @@ def train():
                     + ".validation-summary-topranked",
                     "validation",
                 )
+                rouge_scores.append(rouge_score)
 
                 print(
                     "Average ROUGE score across all documents for this epoch:",
                     rouge_score,
                 )
 
+            print(
+                "ROUGE scores across all epochs:",
+                rouge_scores,
+            )
 
 def test():
     """
