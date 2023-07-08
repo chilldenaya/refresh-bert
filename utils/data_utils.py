@@ -456,25 +456,30 @@ class DataProcessor:
         linecount = 0
         with open(wordembed_filename, "r") as fembedd:
             for line in fembedd:
-                if linecount == 0:
-                    vocabsize = int(line.split()[0])
-                    # Initiate fixed size empty array
-                    word_embedding_array = np.empty(
-                        (vocabsize, FLAGS.wordembed_size), dtype=dtype
-                    )
-                else:
-                    linedata = line.split()
-                    vocab_dict[linedata[0]] = linecount + 1
-                    embeddata = [float(item) for item in linedata[1:]][
-                        0 : FLAGS.wordembed_size
-                    ]
-                    word_embedding_array[linecount - 1] = np.array(
-                        embeddata, dtype=dtype
-                    )
+                try:
+                    if linecount == 0:
+                        vocabsize = int(line.split()[0])
+                        # Initiate fixed size empty array
+                        word_embedding_array = np.empty(
+                            (vocabsize, FLAGS.wordembed_size), dtype=dtype
+                        )
+                    else:
+                        linedata = line.split()
+                        vocab_dict[linedata[0]] = linecount + 1
+                        embeddata = [float(item) for item in linedata[1:]][
+                            0 : FLAGS.wordembed_size
+                        ]
+                        word_embedding_array[linecount - 1] = np.array(
+                            embeddata, dtype=dtype
+                        )
 
+                    linecount += 1
+                except Exception as e:
+                    continue
+                    
                 if linecount % 100000 == 0:
                     print(str(linecount) + " ...")
-                linecount += 1
+                        
         print("Read pretrained embeddings: %s" % str(word_embedding_array.shape))
 
         print("Size of vocab: %d (_PAD:0, _UNK:1)" % len(vocab_dict))

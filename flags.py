@@ -136,7 +136,7 @@ tf.app.flags.DEFINE_integer(
 
 tf.app.flags.DEFINE_string(
     "pretrained_wordembedding",
-    "./data/ind4b/fasttext.4B.id.300.epoch5.uncased.vec",
+    "./data/indo4b/fasttext.4B.id.300.epoch5.uncased.vec",
     "Pretrained wordembedding file trained on the one million benchmark data.",
 )
 
