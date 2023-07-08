@@ -48,12 +48,12 @@ tf.app.flags.DEFINE_integer(
     "max_sent_length", 20, "Maximum sentence length (word per sent.)"
 )
 
-tf.app.flags.DEFINE_integer("sentembed_size", 250, "Size of sentence embedding.") # 350
+tf.app.flags.DEFINE_integer("sentembed_size", 200, "Size of sentence embedding.") # 350
 
 ### Document level features
 
 tf.app.flags.DEFINE_integer(
-    "max_doc_length", 110, "Maximum Document length (sent. per document)."
+    "max_doc_length", 100, "Maximum Document length (sent. per document)."
 )
 
 tf.app.flags.DEFINE_integer(
@@ -124,7 +124,7 @@ tf.app.flags.DEFINE_boolean(
     "weighted_loss", True, "Weighted loss to ignore padded parts."
 )
 
-tf.app.flags.DEFINE_integer("batch_size", 20, "Batch size to use during training.")
+tf.app.flags.DEFINE_integer("batch_size", 50, "Batch size to use during training.")
 
 tf.app.flags.DEFINE_integer(
     "training_checkpoint", 1, "How many training steps to do per checkpoint."
@@ -136,7 +136,7 @@ tf.app.flags.DEFINE_integer(
 
 tf.app.flags.DEFINE_string(
     "pretrained_wordembedding",
-    "./data/1-billion-word-language-modeling-benchmark-r13output.word2vec.vec",
+    "./data/ind4b/fasttext.4B.id.300.epoch5.uncased.vec",
     "Pretrained wordembedding file trained on the one million benchmark data.",
 )
 
@@ -164,7 +164,7 @@ tf.app.flags.DEFINE_boolean(
     "is_use_sbert", False, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_integer("doc_num", 100, "Size of document in dataset used.")
+tf.app.flags.DEFINE_integer("doc_num", 5000, "Size of document in dataset used.")
 
 tf.app.flags.DEFINE_integer(
     "train_epoch_wce", 5, "Number of training epochs per step."
