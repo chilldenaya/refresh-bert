@@ -458,7 +458,9 @@ class DataProcessor:
             for line in fembedd:
                 try:
                     if linecount == 0:
-                        vocabsize = int(line.split()[0])
+                        vocabsize = 4277093
+                        # vocabsize = int(line.split()[0])
+                        
                         # Initiate fixed size empty array
                         word_embedding_array = np.empty(
                             (vocabsize, FLAGS.wordembed_size), dtype=dtype
