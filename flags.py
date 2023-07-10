@@ -23,7 +23,7 @@ tf.app.flags.DEFINE_string(
     "tmp_directory", "/tmp", "Temporary directory used by rouge code."
 )
 
-tf.app.flags.DEFINE_string("use_gpu", "/gpu:0", "Specify which gpu to use.")
+tf.app.flags.DEFINE_string("use_gpu", "/gpu:1", "Specify which gpu to use.")
 
 ### Global setting
 
@@ -79,9 +79,9 @@ tf.app.flags.DEFINE_string("handle_filter_output", "concat", "sum or concat")
 
 ### LSTM Features
 
-tf.app.flags.DEFINE_integer("size", 300, "Size of each model layer.") # 600
+tf.app.flags.DEFINE_integer("size", 100, "Size of each model layer.") # 600
 
-tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
 
 tf.app.flags.DEFINE_string("lstm_cell", "lstm", "Type of LSTM Cell: lstm or gru.")
 
@@ -109,7 +109,7 @@ tf.app.flags.DEFINE_boolean(
 )  # Not used, always use fscore
 
 tf.app.flags.DEFINE_integer(
-    "num_sample_rollout", 10, "Number of Multiple Oracles Used."
+    "num_sample_rollout", 4, "Number of Multiple Oracles Used."
 )  # default 10
 
 ### Training features
@@ -124,7 +124,7 @@ tf.app.flags.DEFINE_boolean(
     "weighted_loss", True, "Weighted loss to ignore padded parts."
 )
 
-tf.app.flags.DEFINE_integer("batch_size", 50, "Batch size to use during training.")
+tf.app.flags.DEFINE_integer("batch_size", 20, "Batch size to use during training.")
 
 tf.app.flags.DEFINE_integer(
     "training_checkpoint", 1, "How many training steps to do per checkpoint."
@@ -164,7 +164,7 @@ tf.app.flags.DEFINE_boolean(
     "is_use_sbert", True, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_integer("doc_num", 100, "Size of document in dataset used.")
+tf.app.flags.DEFINE_integer("doc_num", 500, "Size of document in dataset used.")
 
 tf.app.flags.DEFINE_integer(
     "train_epoch_wce", 5, "Number of training epochs per step."

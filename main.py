@@ -77,6 +77,7 @@ def train():
             start_epoch = 1
             rouge_scores = []
             now = datetime.now()
+                
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
                 # 7. Create new or read existing rouge dict
                 rouge_generator.restore_rouge_dict()
@@ -218,10 +219,23 @@ def train():
                 )
                 now = datetime.now()
 
+
             print(
                 "ROUGE scores across all epochs:",
                 rouge_scores,
             )
+            
+            total_trainable_params = 0
+            trainable_vars = tf.trainable_variables()
+
+            for variable in trainable_vars:
+                shape = variable.get_shape()
+                variable_params = 1
+                for dim in shape:
+                    variable_params *= dim.value
+                total_trainable_params += variable_params
+
+            print("Total trainable parameters:", total_trainable_params)
 
 def test():
     """
