@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 training/
 .ipynb_checkpoints/
+training_*

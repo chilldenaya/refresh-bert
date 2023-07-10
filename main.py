@@ -21,6 +21,7 @@ from utils.data_utils import DataProcessor, Data
 from flags import FLAGS
 from model.refresh import Refresh
 from utils.reward_utils import Reward_Generator
+from datetime import datetime
 
 
 def train():
@@ -75,6 +76,7 @@ def train():
             # 6. Run epoch:
             start_epoch = 1
             rouge_scores = []
+            now = datetime.now()
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
                 # 7. Create new or read existing rouge dict
                 rouge_generator.restore_rouge_dict()
@@ -147,8 +149,10 @@ def train():
                                 ce_loss_val
                             )
                             + " : Minibatch training accuracy= {:.6f}".format(acc_val)
+                            + " "
+                            + str(datetime.now() - now)
                         )
-
+                        
                     # 10. Run optimizer: optimize policy network for the data batch
                     sess.run(
                         [model.train_op_policynet_expreward],
@@ -212,6 +216,7 @@ def train():
                     "Average ROUGE score across all documents for this epoch:",
                     rouge_score,
                 )
+                now = datetime.now()
 
             print(
                 "ROUGE scores across all epochs:",
