@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, print_function
 import os
 
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 from utils.data_utils import DataProcessor, Data
 from flags import FLAGS
@@ -77,8 +78,10 @@ def train():
             start_epoch = 1
             rouge_scores = []
             now = datetime.now()
-                
+
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
+                batch_losses = []
+
                 # 7. Create new or read existing rouge dict
                 rouge_generator.restore_rouge_dict()
 
@@ -110,7 +113,7 @@ def train():
                             model.weight_placeholder: batch_weight,
                             model.sbert_placeholder: batch_sbert_vec,
                         }
-                        
+
                         ce_loss_val, ce_loss_sum, acc_val, acc_sum = sess.run(
                             [
                                 model.rewardweighted_cross_entropy_loss_multisample,  # train_op to be optimized
@@ -121,21 +124,7 @@ def train():
                             feed_dict=feed_dict,
                         )
 
-                        # Print Summary to Tensor Board
-                        model.summary_writer.add_summary(
-                            ce_loss_sum,
-                            (
-                                (epoch - 1) * len(train_data.fileindices)
-                                + step * FLAGS.batch_size
-                            ),
-                        )
-                        model.summary_writer.add_summary(
-                            acc_sum,
-                            (
-                                (epoch - 1) * len(train_data.fileindices)
-                                + step * FLAGS.batch_size
-                            ),
-                        )
+                        batch_losses.append(ce_loss_val)
 
                         print(
                             "MRT: Epoch "
@@ -153,7 +142,7 @@ def train():
                             + " "
                             + str(datetime.now() - now)
                         )
-                        
+
                     # 10. Run optimizer: optimize policy network for the data batch
                     sess.run(
                         [model.train_op_policynet_expreward],
@@ -168,6 +157,18 @@ def train():
 
                     # Increase step
                     step += 1
+
+                # Plot the batch losses
+                epoch_loss = sum(batch_losses) / len(batch_losses)
+                print("Epoch:", epoch, "Loss:", epoch_loss)
+                plt.plot(range(step-1), batch_losses)
+                plt.xlabel("Batch")
+                plt.ylabel("Loss")
+                plt.title("Batch Losses - Epoch ")
+                plt.savefig(
+                    FLAGS.train_dir + "/losses_" + str(epoch) + ".png",
+                )
+                plt.clf()
 
                 # 11. Save model checkpoint
                 checkpoint_path = os.path.join(
@@ -214,17 +215,16 @@ def train():
                 rouge_scores.append(rouge_score)
 
                 print(
-                    "Average ROUGE score across all documents for this epoch:",
+                    "Average ROUGE score across all validation documents for this epoch:",
                     rouge_score,
                 )
                 now = datetime.now()
-
 
             print(
                 "ROUGE scores across all epochs:",
                 rouge_scores,
             )
-            
+
             total_trainable_params = 0
             trainable_vars = tf.trainable_variables()
 
@@ -236,6 +236,7 @@ def train():
                 total_trainable_params += variable_params
 
             print("Total trainable parameters:", total_trainable_params)
+
 
 def test():
     """
@@ -330,13 +331,13 @@ def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
             batch_reward_multiple,
             batch_sbert_vec,
         ) = data.get_batch(((step - 1) * FLAGS.batch_size), (step * FLAGS.batch_size))
-        
+
         batch_logits = session.run(
-            model.logits, 
+            model.logits,
             feed_dict={
                 model.document_placeholder: batch_docs,
                 model.sbert_placeholder: batch_sbert_vec,
-            }
+            },
         )
 
         data_logits.append(batch_logits)
@@ -359,10 +360,11 @@ def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
             batch_sbert_vec,
         ) = data.get_batch(((step - 1) * FLAGS.batch_size), len(data.fileindices))
         batch_logits = session.run(
-            model.logits, feed_dict={
+            model.logits,
+            feed_dict={
                 model.document_placeholder: batch_docs,
                 model.sbert_placeholder: batch_sbert_vec,
-            }
+            },
         )
 
         data_logits.append(batch_logits)

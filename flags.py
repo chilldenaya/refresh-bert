@@ -124,7 +124,7 @@ tf.app.flags.DEFINE_boolean(
     "weighted_loss", True, "Weighted loss to ignore padded parts."
 )
 
-tf.app.flags.DEFINE_integer("batch_size", 20, "Batch size to use during training.")
+tf.app.flags.DEFINE_integer("batch_size", 100, "Batch size to use during training.")
 
 tf.app.flags.DEFINE_integer(
     "training_checkpoint", 1, "How many training steps to do per checkpoint."
@@ -164,10 +164,10 @@ tf.app.flags.DEFINE_boolean(
     "is_use_sbert", True, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_integer("doc_num", 500, "Size of document in dataset used.")
+tf.app.flags.DEFINE_integer("doc_num", 5000, "Size of document in dataset used.") # 193883
 
 tf.app.flags.DEFINE_integer(
-    "train_epoch_wce", 5, "Number of training epochs per step."
+    "train_epoch_wce", 10, "Number of training epochs per step."
 )
 
 ############ Create FLAGS
