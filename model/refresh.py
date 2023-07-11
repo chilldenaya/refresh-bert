@@ -136,6 +136,3 @@ class Refresh:
         # 13. Initializations
         init = tf.global_variables_initializer()
         sess.run(init)
-
-        # 14. Create summary graph for Tensorboard
-        self.summary_writer = tf.train.SummaryWriter(FLAGS.train_dir, sess.graph)

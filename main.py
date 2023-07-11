@@ -58,10 +58,10 @@ def train():
 
             # 2. Prepare data for training and validation
             train_data = DataProcessor().prepare_news_data(
-                vocab_dict, data_type="training"
+                data_type="training"
             )
             validation_data = DataProcessor().prepare_news_data(
-                vocab_dict, data_type="validation"
+                data_type="validation"
             )
 
             # 3. Prepare ROUGE reward generator
@@ -81,9 +81,6 @@ def train():
 
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
                 batch_losses = []
-
-                # 7. Create new or read existing rouge dict
-                rouge_generator.restore_rouge_dict()
 
                 # 8. For every epoch, shuffle train data
                 train_data.shuffle_fileindices()
@@ -174,10 +171,12 @@ def train():
                 checkpoint_path = os.path.join(
                     FLAGS.train_dir, "model.ckpt.epoch-" + str(epoch)
                 )
-                model.saver.save(sess, checkpoint_path)
+                plt.clf()
 
-                # 12. Save rouge dict
-                rouge_generator.save_rouge_dict()
+                # 11. Save model checkpoint
+                model.saver.save(sess, os.path.join(
+                    FLAGS.train_dir, "model.ckpt.epoch-" + str(epoch)
+                ))
 
                 # 13. Get performance on this epoch to validation set
                 (
@@ -193,9 +192,6 @@ def train():
                         model.label_placeholder: validation_labels.eval(session=sess),
                         model.weight_placeholder: validation_weights.eval(session=sess),
                     },
-                )
-                model.summary_writer.add_summary(
-                    validation_sum, (epoch * len(train_data.fileindices))
                 )
 
                 # 14. Print rouge score for this epoch's summary
@@ -259,7 +255,7 @@ def test():
             # vocab_dict contains _PAD and _UNK but not word_embedding_array
 
             print("Prepare test data ...")
-            test_data = DataProcessor().prepare_news_data(vocab_dict, data_type="test")
+            test_data = DataProcessor().prepare_news_data(data_type="test")
 
             # Create Model with various operations
             model = Refresh(sess, len(vocab_dict) - 2)

@@ -26,7 +26,7 @@ UNK_ID = 1
 
 
 class Data:
-    def __init__(self, vocab_dict, data_type):
+    def __init__(self, data_type):
         self.filenames = []
         self.docs = []
         self.titles = []
@@ -433,8 +433,8 @@ class Data:
 
 
 class DataProcessor:
-    def prepare_news_data(self, vocab_dict, data_type="training"):
-        data = Data(vocab_dict, data_type)
+    def prepare_news_data(self, data_type="training"):
+        data = Data(data_type)
         return data
 
     def prepare_vocab_embeddingdict(self):
