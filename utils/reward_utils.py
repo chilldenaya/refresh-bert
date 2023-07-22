@@ -36,12 +36,13 @@ class Reward_Generator:
             + "-orgcase"
         )
 
-        rouge_score = _rouge(system_dir, gold_summary_directory)
+        avg_rouge_score, output_dict = _rouge(system_dir, gold_summary_directory)
 
         # Delete any tmp file
         os.system("rm -r " + FLAGS.tmp_directory + "/tmp*")
 
-        return rouge_score
+        return avg_rouge_score, output_dict
+
 
 def _rouge(system_dir, gold_dir):
     r = Rouge155()
@@ -69,4 +70,4 @@ def _rouge(system_dir, gold_dir):
         + output_dict["rouge_l_f_score"]
     ) / 3.0
 
-    return avg_rscore
+    return avg_rscore, output_dict

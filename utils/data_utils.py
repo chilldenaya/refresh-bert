@@ -186,7 +186,7 @@ class Data:
         )
         batch_reward_multiple = np.empty(((endidx - startidx), 1), dtype=dtype)
         batch_sbert_vec = np.empty(
-            ((endidx - startidx), FLAGS.max_doc_length, FLAGS.sentembed_size), 
+            ((endidx - startidx), FLAGS.max_doc_length, FLAGS.sentembed_size),
             dtype=dtype,
         )
 
@@ -197,9 +197,7 @@ class Data:
             batch_docnames[batch_idx] = self.filenames[fileindex]
 
             # 4. Set batch docs
-            doc_wordids = (
-                []
-            )
+            doc_wordids = []
             for idx in range(FLAGS.max_doc_length):
                 thissent = []
                 if idx < len(self.docs[fileindex]):
@@ -216,7 +214,6 @@ class Data:
                 for item in range(FLAGS.max_doc_length)
             ]
             batch_label[batch_idx] = np.array(labels_vecs[:], dtype=dtype)
-            
 
             # 6. Set batch weights
             weights = process_to_chop_pad(
@@ -372,16 +369,15 @@ class Data:
             doc_data_list, label_data_list, sbert_data_list
         ):
             # 3. Get all sentences in a document
-            doc_lines = doc_data.strip().split("\n") # line sentence
+            doc_lines = doc_data.strip().split("\n")  # line sentence
             label_lines = label_data.strip().split("\n")
             sbert_lines = sbert_data.strip().split("\n")
 
             filename = doc_lines[0].strip()
 
             # 4. Run if only the doc's id match each other
-            if (
-                (filename == label_lines[0].strip())
-                and (filename == sbert_lines[0].strip())
+            if (filename == label_lines[0].strip()) and (
+                filename == sbert_lines[0].strip()
             ):
                 self.filenames.append(filename)
 
@@ -389,7 +385,9 @@ class Data:
                 # self.docs = [[d1s1, d1s2, ... , d1sn], [d2s1, d2s2, ... , d2sn]]
                 thisdoc = []
                 for line in doc_lines[1 : FLAGS.max_doc_length + 1]:
-                    thissent = [int(item) for item in line.strip().split()] # sentence [w1, w2, ...]
+                    thissent = [
+                        int(item) for item in line.strip().split()
+                    ]  # sentence [w1, w2, ...]
                     thisdoc.append(thissent)
                 self.docs.append(thisdoc)
 
@@ -409,13 +407,17 @@ class Data:
                 self.labels.append(thislabel)  # [[1, 19, 25], [1 19]]
                 self.rewards.append(thisreward)  # [0.555, 0.0508]
 
-
                 if FLAGS.is_use_sbert:
                     thissbert = []
-                    for embedding_per_sentence_in_docs_str in sbert_lines[1 : FLAGS.max_doc_length + 1]:
-                        thissent_vec = [float(item) for item in embedding_per_sentence_in_docs_str.strip().split()] # 1 sentence
-                        thissbert.append(thissent_vec) # semua sentence dalam dokumen
-                    self.sbert_vecs.append(thissbert) # semua dokumen
+                    for embedding_per_sentence_in_docs_str in sbert_lines[
+                        1 : FLAGS.max_doc_length + 1
+                    ]:
+                        thissent_vec = [
+                            float(item)
+                            for item in embedding_per_sentence_in_docs_str.strip().split()
+                        ]  # 1 sentence
+                        thissbert.append(thissent_vec)  # semua sentence dalam dokumen
+                    self.sbert_vecs.append(thissbert)  # semua dokumen
 
             else:
                 print("Some problem with %s.* files. Exiting!" % full_data_file_prefix)
@@ -460,7 +462,7 @@ class DataProcessor:
                     if linecount == 0:
                         vocabsize = 4277093
                         # vocabsize = int(line.split()[0])
-                        
+
                         # Initiate fixed size empty array
                         word_embedding_array = np.empty(
                             (vocabsize, FLAGS.wordembed_size), dtype=dtype
@@ -478,10 +480,10 @@ class DataProcessor:
                     linecount += 1
                 except Exception as e:
                     continue
-                    
+
                 if linecount % 100000 == 0:
                     print(str(linecount) + " ...")
-                        
+
         print("Read pretrained embeddings: %s" % str(word_embedding_array.shape))
 
         print("Size of vocab: %d (_PAD:0, _UNK:1)" % len(vocab_dict))

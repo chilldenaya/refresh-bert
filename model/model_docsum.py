@@ -256,7 +256,6 @@ def baseline_future_reward_estimator(extractor_output):
     """
 
     with tf.variable_scope("FutureRewardEstimator") as scope:
-
         last_size = extractor_output.get_shape()[2].value
 
         # Define Variables
@@ -282,7 +281,6 @@ def baseline_single_future_reward_estimator(extractor_output):
     """
 
     with tf.variable_scope("FutureRewardEstimator") as scope:
-
         last_size = extractor_output.get_shape()[2].value
 
         # Define Variables
@@ -615,7 +613,6 @@ def reward_weighted_cross_entropy_loss(logits, labels, actual_rewards, weights):
     """
 
     with tf.variable_scope("RewardWeightedCrossEntropyLoss") as scope:
-
         # Reshape logits and labels to match the requirement of softmax_cross_entropy_with_logits
         logits = tf.reshape(
             logits, [-1, FLAGS.target_label_size]
@@ -670,7 +667,6 @@ def train_cross_entropy_loss(cross_entropy_loss):
     Args: cross_entropy_loss
     """
     with tf.variable_scope("TrainCrossEntropyLoss") as scope:
-
         optimizer = tf.train.AdamOptimizer(
             learning_rate=FLAGS.learning_rate, name="adam"
         )

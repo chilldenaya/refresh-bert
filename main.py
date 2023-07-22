@@ -17,6 +17,7 @@ import os
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import random
 
 from utils.data_utils import DataProcessor, Data
 from flags import FLAGS
@@ -72,21 +73,23 @@ def train():
 
             # 6. Run epoch:
             start_epoch = 1
-            rouge_scores = []
+            validation_rouge_scores = []
+            training_rouge_scores = []
             now = datetime.now()
 
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
-#                 var_name = "PolicyNetwork/SentExt/RNN/MultiRNNCell/Cell0/BasicLSTMCell/Linear/Matrix/read:0"
-#                 print("Variable name:", var_name)
+                #                 var_name = "PolicyNetwork/SentExt/RNN/MultiRNNCell/Cell0/BasicLSTMCell/Linear/Matrix/read:0"
+                #                 print("Variable name:", var_name)
 
-#                 var_value = sess.run(
-#                     tf.get_default_graph().get_tensor_by_name(var_name)
-#                 )
-#                 print("Initial Variable value:", var_value)
+                #                 var_value = sess.run(
+                #                     tf.get_default_graph().get_tensor_by_name(var_name)
+                #                 )
+                #                 print("Initial Variable value:", var_value)
 
                 batch_losses = []
 
                 # 8. For every epoch, shuffle train data
+                random.seed(start_epoch)
                 train_data.shuffle_fileindices()
 
                 # 9. Create batch data and start batch training
@@ -156,10 +159,10 @@ def train():
                         },
                     )
 
-#                     var_value = sess.run(
-#                         tf.get_default_graph().get_tensor_by_name(var_name)
-#                     )
-#                     print("Updated Variable value:", var_value)
+                    #                     var_value = sess.run(
+                    #                         tf.get_default_graph().get_tensor_by_name(var_name)
+                    #                     )
+                    #                     print("Updated Variable value:", var_value)
 
                     # Increase step
                     step += 1
@@ -194,6 +197,11 @@ def train():
                     validation_labels,
                     validation_weights,
                 ) = _batch_predict_with_a_model(validation_data, model, session=sess)
+                (
+                    training_logits,
+                    training_labels,
+                    training_weights,
+                ) = _batch_predict_with_a_model(train_data, model, session=sess)
 
                 validation_acc, validation_sum = sess.run(
                     [model.final_accuracy, model.vaccuracy_summary],
@@ -204,31 +212,70 @@ def train():
                     },
                 )
 
+                training_acc, training_sum = sess.run(
+                    [model.final_accuracy, model.vaccuracy_summary],
+                    feed_dict={
+                        model.logits_placeholder: training_logits.eval(session=sess),
+                        model.label_placeholder: training_labels.eval(session=sess),
+                        model.weight_placeholder: training_weights.eval(session=sess),
+                    },
+                )
+
                 # 14. Print rouge score for this epoch's summary
                 # The output of the convert_and_evaluate function when used on multiple documents
                 # is a dictionary containing the average ROUGE scores across all documents.
                 validation_data.write_prediction_summaries(
                     validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
                 )
+                train_data.write_prediction_summaries(
+                    training_logits, "model.ckpt.epoch-" + str(epoch), session=sess
+                )
 
-                rouge_score = rouge_generator.get_full_rouge(
+                (
+                    validation_rouge_score,
+                    validation_output_dict,
+                ) = rouge_generator.get_full_rouge(
                     FLAGS.train_dir
                     + "/model.ckpt.epoch-"
                     + str(epoch)
                     + ".validation-summary-topranked",
                     "validation",
                 )
-                rouge_scores.append(rouge_score)
-
-                print(
-                    "Average ROUGE score across all validation documents for this epoch:",
-                    rouge_score,
+                (
+                    training_rouge_score,
+                    training_output_dict,
+                ) = rouge_generator.get_full_rouge(
+                    FLAGS.train_dir
+                    + "/model.ckpt.epoch-"
+                    + str(epoch)
+                    + ".training-summary-topranked",
+                    "training",
                 )
+
+                validation_rouge_scores.append(
+                    {
+                        "rouge_1_f_score": validation_output_dict["rouge_1_f_score"],
+                        "rouge_2_f_score": validation_output_dict["rouge_2_f_score"],
+                        "rouge_l_f_score": validation_output_dict["rouge_l_f_score"],
+                    }
+                )
+                training_rouge_scores.append(
+                    {
+                        "rouge_1_f_score": training_output_dict["rouge_1_f_score"],
+                        "rouge_2_f_score": training_output_dict["rouge_2_f_score"],
+                        "rouge_l_f_score": training_output_dict["rouge_l_f_score"],
+                    }
+                )
+
                 now = datetime.now()
 
             print(
-                "ROUGE scores across all epochs:",
-                rouge_scores,
+                "TRAINING ROUGE scores across all epochs:",
+                training_rouge_scores,
+            )
+            print(
+                "VALIDATION ROUGE scores across all epochs:",
+                validation_rouge_scores,
             )
 
             total_trainable_params = 0
