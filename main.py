@@ -57,12 +57,8 @@ def train():
                 ) = DataProcessor().prepare_vocab_embeddingdict()
 
             # 2. Prepare data for training and validation
-            train_data = DataProcessor().prepare_news_data(
-                data_type="training"
-            )
-            validation_data = DataProcessor().prepare_news_data(
-                data_type="validation"
-            )
+            train_data = DataProcessor().prepare_news_data(data_type="training")
+            validation_data = DataProcessor().prepare_news_data(data_type="validation")
 
             # 3. Prepare ROUGE reward generator
             rouge_generator = Reward_Generator()
@@ -80,6 +76,14 @@ def train():
             now = datetime.now()
 
             for epoch in range(start_epoch, FLAGS.train_epoch_wce + 1):
+#                 var_name = "PolicyNetwork/SentExt/RNN/MultiRNNCell/Cell0/BasicLSTMCell/Linear/Matrix/read:0"
+#                 print("Variable name:", var_name)
+
+#                 var_value = sess.run(
+#                     tf.get_default_graph().get_tensor_by_name(var_name)
+#                 )
+#                 print("Initial Variable value:", var_value)
+
                 batch_losses = []
 
                 # 8. For every epoch, shuffle train data
@@ -152,13 +156,18 @@ def train():
                         },
                     )
 
+#                     var_value = sess.run(
+#                         tf.get_default_graph().get_tensor_by_name(var_name)
+#                     )
+#                     print("Updated Variable value:", var_value)
+
                     # Increase step
                     step += 1
 
                 # Plot the batch losses
                 epoch_loss = sum(batch_losses) / len(batch_losses)
                 print("Epoch:", epoch, "Loss:", epoch_loss)
-                plt.plot(range(step-1), batch_losses)
+                plt.plot(range(step - 1), batch_losses)
                 plt.xlabel("Batch")
                 plt.ylabel("Loss")
                 plt.title("Batch Losses - Epoch ")
@@ -174,9 +183,10 @@ def train():
                 plt.clf()
 
                 # 11. Save model checkpoint
-                model.saver.save(sess, os.path.join(
-                    FLAGS.train_dir, "model.ckpt.epoch-" + str(epoch)
-                ))
+                model.saver.save(
+                    sess,
+                    os.path.join(FLAGS.train_dir, "model.ckpt.epoch-" + str(epoch)),
+                )
 
                 # 13. Get performance on this epoch to validation set
                 (
@@ -230,7 +240,6 @@ def train():
                 for dim in shape:
                     variable_params *= dim.value
                 total_trainable_params += variable_params
-
             print("Total trainable parameters:", total_trainable_params)
 
 

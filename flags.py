@@ -79,9 +79,9 @@ tf.app.flags.DEFINE_string("handle_filter_output", "concat", "sum or concat")
 
 ### LSTM Features
 
-tf.app.flags.DEFINE_integer("size", 100, "Size of each model layer.") # 600
+tf.app.flags.DEFINE_integer("size", 600, "Size of each model layer.") # 600
 
-tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.") # 1
 
 tf.app.flags.DEFINE_string("lstm_cell", "lstm", "Type of LSTM Cell: lstm or gru.")
 
@@ -124,7 +124,7 @@ tf.app.flags.DEFINE_boolean(
     "weighted_loss", True, "Weighted loss to ignore padded parts."
 )
 
-tf.app.flags.DEFINE_integer("batch_size", 100, "Batch size to use during training.")
+tf.app.flags.DEFINE_integer("batch_size", 128, "Batch size to use during training.")
 
 tf.app.flags.DEFINE_integer(
     "training_checkpoint", 1, "How many training steps to do per checkpoint."
@@ -161,13 +161,13 @@ tf.app.flags.DEFINE_string(
 )
 
 tf.app.flags.DEFINE_boolean(
-    "is_use_sbert", True, "use SBERT as sentence embeddings."
+    "is_use_sbert", False, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_integer("doc_num", 5000, "Size of document in dataset used.") # 193883
+tf.app.flags.DEFINE_integer("doc_num", 193883, "Size of document in dataset used.") # 193883
 
 tf.app.flags.DEFINE_integer(
-    "train_epoch_wce", 10, "Number of training epochs per step."
+    "train_epoch_wce", 1, "Number of training epochs per step."
 )
 
 ############ Create FLAGS

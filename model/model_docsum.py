@@ -143,8 +143,8 @@ def sentence_extractor_seqrnn_docatt(
 
 
 def policy_network(
-    vocab_embed_variable, 
-    document_placeholder, 
+    vocab_embed_variable,
+    document_placeholder,
     sbert_placeholder,
 ):
     """Build the policy core network.
@@ -219,7 +219,7 @@ def policy_network(
                         FLAGS.sentembed_size,
                     ],
                 )
-            
+
                 sent_embedding = document_sent_embedding
 
         # 4. Reshape sentence embedding
@@ -739,11 +739,14 @@ def train_neg_expectedreward(reward_weighted_cross_entropy_loss_multisample):
             var_list=policy_network_variables,
         )
 
+        print(policy_network_variables)
+
         # 3. Clip gradient: Pascanu et al. 2013, Exploding gradient problem
         grads_and_vars_capped_norm = []
         for grad, var in grads_and_vars:
             if grad is None:
                 continue
+            print(str(var))
             grads_and_vars_capped_norm.append((tf.clip_by_norm(grad, 5.0), var))
 
         # 4. Update policy network variables by applying gradient
