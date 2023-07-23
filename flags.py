@@ -27,10 +27,6 @@ tf.app.flags.DEFINE_string("use_gpu", "/gpu:1", "Specify which gpu to use.")
 
 ### Global setting
 
-tf.app.flags.DEFINE_string("exp_mode", "train", "Training 'train' or Test 'test' Mode.")
-
-tf.app.flags.DEFINE_integer("model_to_load", 100, "Model to load for testing.")
-
 tf.app.flags.DEFINE_boolean("use_fp16", False, "Use fp16 instead of fp32.")
 
 tf.app.flags.DEFINE_string("data_mode", "liputan6", "cnn or dailymail or cnn-dailymail")
@@ -114,10 +110,6 @@ tf.app.flags.DEFINE_integer(
 
 ### Training features
 
-tf.app.flags.DEFINE_string(
-    "train_dir", "./training", "Training directory."
-)
-
 tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
 
 tf.app.flags.DEFINE_boolean(
@@ -160,14 +152,24 @@ tf.app.flags.DEFINE_string(
     "Directory where document sentences are kept.",
 )
 
+# CHANGE HERE
+
 tf.app.flags.DEFINE_boolean(
     "is_use_sbert", False, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_integer("doc_num", 193883, "Size of document in dataset used.") # 193883
+tf.app.flags.DEFINE_string("exp_mode", "train", "Training 'train' or Test 'test' Mode.")
+
+tf.app.flags.DEFINE_string(
+    "train_dir", "./training", "Training directory."
+)
+
+tf.app.flags.DEFINE_integer("model_to_load", 50, "Model to load for testing.")
+
+tf.app.flags.DEFINE_integer("doc_num", 500, "Size of document in dataset used.") # 193883
 
 tf.app.flags.DEFINE_integer(
-    "train_epoch_wce", 1, "Number of training epochs per step."
+    "train_epoch_wce", 50, "Number of training epochs per step."
 )
 
 ############ Create FLAGS

@@ -180,12 +180,6 @@ def train():
                 plt.clf()
 
                 # 11. Save model checkpoint
-                checkpoint_path = os.path.join(
-                    FLAGS.train_dir, "model.ckpt.epoch-" + str(epoch)
-                )
-                plt.clf()
-
-                # 11. Save model checkpoint
                 model.saver.save(
                     sess,
                     os.path.join(FLAGS.train_dir, "model.ckpt.epoch-" + str(epoch)),
@@ -303,11 +297,12 @@ def test():
         # Start a session
         with tf.Session(config=config) as sess:
             ### Prepare data for training
-            print("Prepare vocab dict and read pretrained word embeddings ...")
-            (
-                vocab_dict,
-                word_embedding_array,
-            ) = DataProcessor().prepare_vocab_embeddingdict()
+            vocab_dict = {}
+            if not FLAGS.is_use_sbert:
+                (
+                    vocab_dict,
+                    word_embedding_array,
+                ) = DataProcessor().prepare_vocab_embeddingdict()
             # vocab_dict contains _PAD and _UNK but not word_embedding_array
 
             print("Prepare test data ...")
@@ -316,25 +311,20 @@ def test():
             # Create Model with various operations
             model = Refresh(sess, len(vocab_dict) - 2)
 
-            # Select the model
-            if os.path.isfile(
+            selected_modelpath = (
                 FLAGS.train_dir + "/model.ckpt.epoch-" + str(FLAGS.model_to_load)
-            ):
-                selected_modelpath = (
-                    FLAGS.train_dir + "/model.ckpt.epoch-" + str(FLAGS.model_to_load)
-                )
-            else:
-                print("Model not found in checkpoint folder.")
-                exit(0)
-
+            )
             # Reload saved model and test
             print("Reading model parameters from %s" % selected_modelpath)
             model.saver.restore(sess, selected_modelpath)
             print("Model loaded.")
 
             # Initialize word embedding before training
-            print("Initialize word embedding vocabulary with pretrained embeddings ...")
-            sess.run(model.vocab_embed_variable.assign(word_embedding_array))
+            if not FLAGS.is_use_sbert:
+                print(
+                    "Initialize word embedding vocabulary with pretrained embeddings ..."
+                )
+                sess.run(model.vocab_embed_variable.assign(word_embedding_array))
 
             # Test Accuracy and Prediction
             print("Performance on the test data:")
@@ -364,6 +354,25 @@ def test():
                 "model.ckpt.epoch-" + str(FLAGS.model_to_load),
                 session=sess,
             )
+
+            rouge_generator = Reward_Generator()
+            (
+                test_rouge_score,
+                test_output_dict,
+            ) = rouge_generator.get_full_rouge(
+                FLAGS.train_dir
+                + "/model.ckpt.epoch-"
+                + str(FLAGS.model_to_load)
+                + ".test-summary-topranked",
+                "test",
+            )
+
+            result = {
+                "rouge_1_f_score": test_output_dict["rouge_1_f_score"],
+                "rouge_2_f_score": test_output_dict["rouge_2_f_score"],
+                "rouge_l_f_score": test_output_dict["rouge_l_f_score"],
+            }
+            print(result)
 
 
 def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
