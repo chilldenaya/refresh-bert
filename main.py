@@ -18,6 +18,7 @@ import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import random
+import json
 
 from utils.data_utils import DataProcessor, Data
 from flags import FLAGS
@@ -271,6 +272,16 @@ def train():
                 "VALIDATION ROUGE scores across all epochs:",
                 validation_rouge_scores,
             )
+            
+            file_path = f"{FLAGS.train_dir}/ROUGE.json"
+            rouge_result = {
+                "training_rouge_scores": training_rouge_scores,
+                "validation_rouge_scores": validation_rouge_scores,
+            }
+
+            # Save the dictionary to a JSON file
+            with open(file_path, "w") as json_file:
+                json.dump(rouge_result, json_file)
 
             total_trainable_params = 0
             trainable_vars = tf.trainable_variables()
