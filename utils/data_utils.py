@@ -134,6 +134,10 @@ class Data:
             selected_sents = [
                 docsents[sentid] for sentid in final_sentids if sentid < len(docsents)
             ]
+            print("\n\nSUMMARY RESULT \n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
+            for selected_sent in selected_sents:
+                print(selected_sent)
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
 
             summary_file.write("".join(selected_sents) + "\n")
             summary_file.close()

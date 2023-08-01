@@ -155,10 +155,10 @@ tf.app.flags.DEFINE_integer("size", 600, "Size of each model layer.") # 600
 tf.app.flags.DEFINE_integer("num_layers", 1, "Number of layers in the model.") # 1
 
 tf.app.flags.DEFINE_boolean(
-    "is_use_sbert", False, "use SBERT as sentence embeddings."
+    "is_use_sbert", True, "use SBERT as sentence embeddings."
 )
 
-tf.app.flags.DEFINE_string("exp_mode", "test", "Training 'train' or Test 'test' Mode.")
+tf.app.flags.DEFINE_string("exp_mode", "inference", "Training 'train' or Test 'test' Mode.")
 
 tf.app.flags.DEFINE_string(
     "train_dir", "./training", "Training directory."
@@ -169,7 +169,7 @@ tf.app.flags.DEFINE_integer("model_to_load", 1, "Model to load for testing.")
 tf.app.flags.DEFINE_integer("doc_num", 500, "Size of document in dataset used.") # 193883
 
 tf.app.flags.DEFINE_integer(
-    "train_epoch_wce", 1, "Number of training epochs per step."
+    "train_epoch_wce", 20, "Number of training epochs per step."
 )
 
 ############ Create FLAGS
