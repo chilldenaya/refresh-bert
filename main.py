@@ -180,23 +180,32 @@ def train():
                 )
                 plt.clf()
 
+                
                 # 11. Save model checkpoint
+                print(datetime.now(), "saving model ...")
                 model.saver.save(
                     sess,
                     os.path.join(FLAGS.train_dir, "model.ckpt.epoch-" + str(epoch)),
                 )
+                print(datetime.now(), "model saved")
 
                 # 13. Get performance on this epoch to validation set
+                print(datetime.now(), "get validation logit ...")
                 (
                     validation_logits,
                     validation_labels,
                     validation_weights,
                 ) = _batch_predict_with_a_model(validation_data, model, session=sess)
+                print(datetime.now(), "get validation logit clear")
+                
+                print(datetime.now(), "get training logit ...")
+                
                 (
                     training_logits,
                     training_labels,
                     training_weights,
                 ) = _batch_predict_with_a_model(train_data, model, session=sess)
+                print(datetime.now(), "get training logit clear")
 
                 validation_acc, validation_sum = sess.run(
                     [model.final_accuracy, model.vaccuracy_summary],
@@ -219,13 +228,16 @@ def train():
                 # 14. Print rouge score for this epoch's summary
                 # The output of the convert_and_evaluate function when used on multiple documents
                 # is a dictionary containing the average ROUGE scores across all documents.
+                print(datetime.now(), "writing prediction summaries ...")
                 validation_data.write_prediction_summaries(
                     validation_logits, "model.ckpt.epoch-" + str(epoch), session=sess
                 )
                 train_data.write_prediction_summaries(
                     training_logits, "model.ckpt.epoch-" + str(epoch), session=sess
                 )
+                print(datetime.now(), "writing prediction summaries completed")
 
+                print(datetime.now(), "get prediction full rouge ...")
                 (
                     validation_rouge_score,
                     validation_output_dict,
@@ -246,6 +258,7 @@ def train():
                     + ".training-summary-topranked",
                     "training",
                 )
+                print(datetime.now(), "get prediction full rouge completed")
 
                 validation_rouge_scores.append(
                     {
@@ -308,63 +321,63 @@ def test():
         # Start a session
         with tf.Session(config=config) as sess:
             ### Prepare data for training
-            vocab_dict = {}
-            if not FLAGS.is_use_sbert:
-                (
-                    vocab_dict,
-                    word_embedding_array,
-                ) = DataProcessor().prepare_vocab_embeddingdict()
-            # vocab_dict contains _PAD and _UNK but not word_embedding_array
+#             vocab_dict = {}
+#             if not FLAGS.is_use_sbert:
+#                 (
+#                     vocab_dict,
+#                     word_embedding_array,
+#                 ) = DataProcessor().prepare_vocab_embeddingdict()
+#             # vocab_dict contains _PAD and _UNK but not word_embedding_array
 
-            print("Prepare test data ...")
-            test_data = DataProcessor().prepare_news_data(data_type="test")
+#             print("Prepare test data ...")
+#             test_data = DataProcessor().prepare_news_data(data_type="training")
 
-            # Create Model with various operations
-            model = Refresh(sess, len(vocab_dict) - 2)
+#             # Create Model with various operations
+#             model = Refresh(sess, len(vocab_dict) - 2)
 
-            selected_modelpath = (
-                FLAGS.train_dir + "/model.ckpt.epoch-" + str(FLAGS.model_to_load)
-            )
-            # Reload saved model and test
-            print("Reading model parameters from %s" % selected_modelpath)
-            model.saver.restore(sess, selected_modelpath)
-            print("Model loaded.")
+#             selected_modelpath = (
+#                 FLAGS.train_dir + "/model.ckpt.epoch-" + str(FLAGS.model_to_load)
+#             )
+#             # Reload saved model and test
+#             print("Reading model parameters from %s" % selected_modelpath)
+#             model.saver.restore(sess, selected_modelpath)
+#             print("Model loaded.")
 
-            # Initialize word embedding before training
-            if not FLAGS.is_use_sbert:
-                print(
-                    "Initialize word embedding vocabulary with pretrained embeddings ..."
-                )
-                sess.run(model.vocab_embed_variable.assign(word_embedding_array))
+#             # Initialize word embedding before training
+#             if not FLAGS.is_use_sbert:
+#                 print(
+#                     "Initialize word embedding vocabulary with pretrained embeddings ..."
+#                 )
+#                 sess.run(model.vocab_embed_variable.assign(word_embedding_array))
 
-            # Test Accuracy and Prediction
-            print("Performance on the test data:")
-            FLAGS.authorise_gold_label = False
-            test_logits, test_labels, test_weights = _batch_predict_with_a_model(
-                test_data, model, session=sess
-            )
-            test_acc = sess.run(
-                model.final_accuracy,
-                feed_dict={
-                    model.logits_placeholder: test_logits.eval(session=sess),
-                    model.label_placeholder: test_labels.eval(session=sess),
-                    model.weight_placeholder: test_weights.eval(session=sess),
-                },
-            )
+#             # Test Accuracy and Prediction
+#             print("Performance on the test data:")
+#             FLAGS.authorise_gold_label = False
+#             test_logits, test_labels, test_weights = _batch_predict_with_a_model(
+#                 test_data, model, session=sess
+#             )
+#             test_acc = sess.run(
+#                 model.final_accuracy,
+#                 feed_dict={
+#                     model.logits_placeholder: test_logits.eval(session=sess),
+#                     model.label_placeholder: test_labels.eval(session=sess),
+#                     model.weight_placeholder: test_weights.eval(session=sess),
+#                 },
+#             )
 
             # Print Test Summary
-            print(
-                "Test ("
-                + str(len(test_data.fileindices))
-                + ") accuracy= {:.6f}".format(test_acc)
-            )
+#             print(
+#                 "Test ("
+#                 + str(len(test_data.fileindices))
+#                 + ") accuracy= {:.6f}".format(test_acc)
+#             )
 
             # Writing test predictions and final summaries
-            test_data.write_prediction_summaries(
-                test_logits,
-                "model.ckpt.epoch-" + str(FLAGS.model_to_load),
-                session=sess,
-            )
+#             test_data.write_prediction_summaries(
+#                 test_logits,
+#                 "model.ckpt.epoch-" + str(FLAGS.model_to_load),
+#                 session=sess,
+#             )
 
             rouge_generator = Reward_Generator()
             (
@@ -374,8 +387,8 @@ def test():
                 FLAGS.train_dir
                 + "/model.ckpt.epoch-"
                 + str(FLAGS.model_to_load)
-                + ".test-summary-topranked",
-                "test",
+                + ".training-summary-topranked",
+                "training",
             )
 
             result = {
@@ -385,6 +398,13 @@ def test():
             }
             print(result)
 
+            file_path = f"{FLAGS.train_dir}/ROUGE_test.json"
+            rouge_result = {
+                "rouge_scores": result,
+            }
+            with open(file_path, "w") as json_file:
+                json.dump(rouge_result, json_file)
+                
 
 def _batch_predict_with_a_model(data: Data, model: Refresh, session=None):
     data_logits = []

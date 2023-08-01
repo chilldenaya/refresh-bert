@@ -427,7 +427,7 @@ class Data:
                 print("%d ..." % doccount)
 
             doccount += 1
-            if data_type == "training" and doccount == FLAGS.doc_num:
+            if doccount == FLAGS.doc_num:
                 break
 
         # Set Fileindices

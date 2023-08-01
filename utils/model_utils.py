@@ -413,7 +413,7 @@ def predict_topranked(batch_softmax_logits, batch_weights, batch_filenames):
         elif filename.startswith("dailymail-"):
             final_sentences = sentindices[:4]
         elif filename.startswith("liputan6-"):
-            final_sentences = sentindices[:3]
+            final_sentences = sentindices[:2]
         else:
             print(filename)
             print("Filename does not have cnn or dailymail or liputan6 in it.")
