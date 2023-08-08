@@ -161,10 +161,10 @@ tf.app.flags.DEFINE_boolean(
 tf.app.flags.DEFINE_string("exp_mode", "inference", "Training 'train' or Test 'test' Mode.")
 
 tf.app.flags.DEFINE_string(
-    "train_dir", "./training", "Training directory."
+    "train_dir", "./training_500_sbert_2sum", "Training directory."
 )
 
-tf.app.flags.DEFINE_integer("model_to_load", 1, "Model to load for testing.")
+tf.app.flags.DEFINE_integer("model_to_load", 11, "Model to load for testing.")
 
 tf.app.flags.DEFINE_integer("doc_num", 500, "Size of document in dataset used.") # 193883
 
